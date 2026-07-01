@@ -1,13 +1,14 @@
 @echo off
 REM ============================================================
-REM  Lanceur local du site BOAS Explorer
-REM  Double-clique sur ce fichier pour demarrer le site.
+REM  Lanceur local de l'ANCIEN PROTOTYPE BOAS Explorer (legacy/)
+REM  Pour la vraie app React, voir app/ (npm run dev).
+REM  Double-clique sur ce fichier pour demarrer le prototype.
 REM ============================================================
 setlocal
 cd /d "%~dp0"
 
 set PORT=8000
-set PAGE=BOAS%%20Explorer.dc.html
+set PAGE=legacy/BOAS%%20Explorer.dc.html
 
 echo.
 echo  Demarrage du serveur local sur le port %PORT% ...

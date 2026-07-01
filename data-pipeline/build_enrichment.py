@@ -15,7 +15,7 @@ import zipfile, re, json, sys, unicodedata
 sys.stdout.reconfigure(encoding="utf-8")
 
 DOCX = "BOAS_modes_de_fonctionnement.docx"
-DATA = "boas_data.json"
+DATA = "../app/src/data/boas_data.json"  # source de verite consommee par l'app React
 OUT = "boas_enrichment.json"
 
 TXT = re.compile(r"<w:t(?:\s[^>]*)?>(.*?)</w:t>", re.S)

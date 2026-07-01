@@ -16,7 +16,7 @@ from datetime import datetime
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-DATA = "boas_data.json"
+DATA = "../app/src/data/boas_data.json"  # source de verite consommee par l'app React
 ENRICH = "boas_inputs_enrichment.json"
 FIELDS = ["inputData"]
 

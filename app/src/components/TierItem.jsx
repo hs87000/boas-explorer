@@ -1,0 +1,24 @@
+import Hoverable from "./Hoverable";
+import { rankBubbleStyle } from "../lib/styles";
+import { statusColor } from "../lib/boas";
+
+export default function TierItem({ tool, rank, onOpen, onRankClick, rankAriaLabel = "Changer le rang" }) {
+  return (
+    <Hoverable
+      as="div"
+      onClick={onOpen}
+      tabIndex={0}
+      role="button"
+      style={{ display: "inline-flex", alignItems: "center", gap: 8, maxWidth: 252, background: "#f7f8fa", borderWidth: 1, borderStyle: "solid", borderColor: "#e8eaef", borderRadius: 10, padding: "5px 11px 5px 6px", cursor: "pointer" }}
+      hoverStyle={{ borderColor: "#10b981", background: "#f0fdf6" }}
+    >
+      <button onClick={onRankClick} aria-label={rankAriaLabel} style={rankBubbleStyle(rank, 24)}>
+        {rank || "+"}
+      </button>
+      <span style={{ fontSize: 13, fontWeight: 600, color: "#0f1424", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 180 }}>
+        {tool.name}
+      </span>
+      <span style={{ width: 8, height: 8, borderRadius: 999, flex: "none", background: statusColor(tool.validation) }} />
+    </Hoverable>
+  );
+}

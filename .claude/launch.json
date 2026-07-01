@@ -2,9 +2,15 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "boas-static",
+      "name": "app-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "app"],
+      "port": 5173
+    },
+    {
+      "name": "boas-legacy",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8787"],
+      "runtimeArgs": ["-m", "http.server", "8787", "--directory", "legacy"],
       "port": 8787
     },
     {
