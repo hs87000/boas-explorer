@@ -12,12 +12,6 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8787", "--directory", "legacy"],
       "port": 8787
-    },
-    {
-      "name": "boas-runner",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "4178", "--directory", "BOAS-Runner"],
-      "port": 4178
     }
   ]
 }
