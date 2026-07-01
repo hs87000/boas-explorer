@@ -1,0 +1,1567 @@
+{
+  "source": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante",
+  "count": 48,
+  "tools": [
+    {
+      "id": 1,
+      "name": "EHDEN / Persephone",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/ehden-persephone",
+      "authorType": "Plateforme de données",
+      "objectives": [
+        "Manipulation / transformation BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SQL"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Standardiser la base principale du SNDS vers le format international OMOP, pour suivre le parcours de soins.",
+      "dataDescription": "Données en tableaux : actes, biologie, dispositifs médicaux, diagnostics, séjours, mortalité.",
+      "context": "SNDS → OMOP (DCIR, PMSI, CépiDC)",
+      "repoUrl": "https://gitlab.com/healthdatahub/applications-du-hdh/snds_omop",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il prend les données brutes du SNDS (remboursements de ville, hôpital, décès) et les réécrit dans un format international standard appelé OMOP, organisé autour d'une fiche « patient ». Des scripts traduisent les codes français (médicaments, actes, maladies) vers des codes internationaux, nettoient certaines données et reconstruisent des informations manquantes, pour qu'on puisse suivre facilement le parcours de soins d'une personne et comparer avec d'autres pays.",
+      "limits": "Il ne crée aucune information nouvelle : il réorganise l'existant. Il est prévu pour les années 2015 à 2021. La traduction d'un code français vers un code international n'est pas toujours parfaite.",
+      "inclusion": "Un échantillon de 570 000 personnes tirées au hasard dans la base, sur 2015-2021.",
+      "exclusion": "Aucun (c'est un outil de mise en forme, pas une sélection de patients).",
+      "inputData": "Base principale du SNDS, cohorte de 570 000 personnes tirées au hasard (2015-2021) : DCIR (2015-2021), PMSI (2015-2021), CépiDC (2015-2017), référentiel des bénéficiaires, référentiel médicalisé. Terminologies SNDS (CCAM, CSARR, NABM, LPP…) + terminologies internationales OMOP-CDM (téléchargées sur Athena) + correspondances Etalab et codes communes INSEE."
+    },
+    {
+      "id": 2,
+      "name": "Top diabète – cartographie CNAM (G8, 2019)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/algorithme-pour-construire-le-top-diabete-de-la-cartographie",
+      "authorType": "Administrations et ministère",
+      "objectives": [
+        "Cartographie des pathologies",
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Diabète"
+      ],
+      "languages": [
+        "Python",
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Repérer les personnes soignées pour un diabète et les compter au niveau national. Repérage par médicaments antidiabétiques répétés, ALD diabète ou hospitalisation diabète.",
+      "dataDescription": "Données en tableaux : médicaments délivrés, hospitalisations + diagnostics, statut ALD.",
+      "context": "Base principale du SNDS, testé sur données fictives 2018-2019",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/cnam/top-diabete",
+      "licence": "MPL 2.0",
+      "lastUpdate": "Mars 2024",
+      "howItWorks": "Il passe en revue les remboursements de toute la population et repère les personnes diabétiques avec des règles simples : avoir retiré au moins 3 fois des médicaments du diabète dans l'année (ou l'année d'avant), OU avoir le statut « affection longue durée » pour diabète, OU avoir été hospitalisé avec un diagnostic de diabète (ou une complication). Si au moins une condition est vraie, la personne est comptée comme diabétique. On additionne pour avoir le total national.",
+      "limits": "Il repère les diabétiques d'une année donnée mais ne dit pas quand le diabète est apparu. Il est réglé pour être très sûr, quitte à en manquer quelques-uns. Il tourne sur des données fictives ; petits écarts (0,3 à 3 %) avec la référence.",
+      "inclusion": "Personnes avec au moins 3 délivrances d'antidiabétiques (ou 2 si grand conditionnement), et/ou une ALD diabète, et/ou une hospitalisation pour diabète.",
+      "exclusion": "Personnes avec moins de 3 délivrances, sans ALD et sans hospitalisation pour diabète dans les 5 ans.",
+      "inputData": "Base principale du SNDS : DCIR — table ER_PHA_F (délivrances de médicaments antidiabétiques, classe ATC A10), ER_PRS_F / ER_ETE_F (prestations) ; ALD (codes CIM-10 E10 à E14) ; PMSI-MCO (séjours, diagnostics DP/DR/DA). Fichier fourni medicaments_antidiabetiques_G8.csv. Tourne sur données synthétiques 2018-2019 (programme source CNAM : 2015-2019)."
+    },
+    {
+      "id": 3,
+      "name": "Prise en charge des allergies aux pollens en Normandie",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/prise-en-charge-des-allergies-aux-pollens-dans-la-region",
+      "authorType": "Plateforme de données",
+      "objectives": [
+        "Requête à la demande"
+      ],
+      "medicalDomains": [
+        "Maladies respiratoires"
+      ],
+      "languages": [
+        "SAS",
+        "SQL"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Décrire la prise en charge des patients allergiques aux pollens (rhinites) en Normandie : soins et traitements remboursés.",
+      "dataDescription": "Données en tableaux (remboursements de soins).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/hdh/requ-tes-la-demande/allergies-normandie",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il cherche, parmi les habitants des 5 départements de Normandie, ceux qui ont reçu au moins une fois en 2010 un médicament typique des allergies (une liste de médicaments anti-allergie). Il les compte par département, sexe, âge (majeur/mineur) et par commune, pour voir quelles communes sont les plus touchées par les rhinites allergiques.",
+      "limits": "Basé sur les médicaments remboursés : il rate les gens qui ne se soignent pas ou achètent sans ordonnance. Paramétré pour 2010 (adaptable). Non validé.",
+      "inclusion": "Habitants de Normandie (départements 14, 27, 50, 61, 76) ayant eu au moins une délivrance d'un médicament anti-allergie en 2010.",
+      "exclusion": "Personnes résidant hors de Normandie.",
+      "inputData": "DCIR uniquement. Délivrances de médicaments des classes ATC anti-allergie (liste de codes : D04AB, D05*, D07*, R01*, R03*, R05*, R06*, S01*…). Table EXTRACTION_PATIENTS2010TR pour la commune de résidence. Année de soins 2010, flux 2010-2013. Départements 14, 27, 50, 61, 76."
+    },
+    {
+      "id": 4,
+      "name": "Indicateurs sur le statut d'ayant droit (2012-2020)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/indicateurs-sur-le-statut-dayant-droit-entre-2012-et-2020",
+      "authorType": "Autre",
+      "objectives": [
+        "Requête à la demande"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS",
+        "SQL"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Compter les ayants droit de 40 ans et + (personnes couvertes via un proche assuré) entre 2012 et 2020. Mesurer la part des femmes et l'effet de la réforme PUMA (2016).",
+      "dataDescription": "Données en tableaux : fichier des bénéficiaires (sexe, naissance, régime, statut) + prestations.",
+      "context": "Base principale du SNDS (DCIR)",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/hdh/requ-tes-la-demande/femmes-ayant-droit",
+      "licence": "Apache 2.0",
+      "lastUpdate": "Mai 2022",
+      "howItWorks": "Il sélectionne les personnes de 40 ans et plus en 2020 qui sont « ayant droit » (couvertes via un proche, pas en leur nom propre). Pour chacune il récupère sexe, année de naissance, régime et statut, puis compte combien il y en a chaque année de 2012 à 2020, la part de femmes et combien changent de statut. On peut ainsi observer l'effet de la réforme PUMA de 2016.",
+      "limits": "Non validé (aucune donnée externe pour vérifier). Pas de maintenance.",
+      "inclusion": "Bénéficiaires « ayant droit » de 40 ans et plus en 2020 (nés en 1980 ou avant), tous régimes.",
+      "exclusion": "Les personnes ayant le statut « assuré » (en leur nom propre) ne sont pas des ayants droit : elles sont écartées.",
+      "inputData": "DCIR — table ER_PRS_F (prestations, statut BEN_QAF_COD). Référentiel des bénéficiaires IR_BEN_R (sexe, année de naissance, régime via ORG_AFF_BEN). Identifiants BEN_NIR_PSA et BEN_NIR_ANO. Période 2012-2020, tous régimes."
+    },
+    {
+      "id": 5,
+      "name": "Magic Loop",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/magic-loop",
+      "authorType": "Administrations et ministère",
+      "objectives": [
+        "Manipulation / transformation BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Macro qui simplifie les extractions sur les données de ville (DCIR) : à partir d'une requête sur un mois, génère des tables de consommation de soins sur une période.",
+      "dataDescription": "Données en tableaux (consommation de soins, tables DCIR).",
+      "context": "Base principale du SNDS (DCIR)",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/ars/magic-loop",
+      "licence": "Apache 2.0",
+      "lastUpdate": "Février 2023",
+      "howItWorks": "C'est un mini-programme (macro) qui simplifie l'extraction des données de ville (DCIR). On écrit sa requête sur un seul mois de données, et Magic Loop l'étend et la répète automatiquement sur toute la période voulue, en gérant les contraintes techniques de découpage. On obtient des tableaux de consommation de soins prêts à l'emploi.",
+      "limits": "Outil purement technique d'extraction (pas d'analyse médicale). Intégré au portail SNDS. Non validé sur données externes.",
+      "inclusion": "Les données du DCIR sur la période demandée par l'utilisateur.",
+      "exclusion": "Aucun (outil d'extraction).",
+      "inputData": "Tables du DCIR du portail SNDS. En entrée : une requête écrite par l'utilisateur sur un seul mois de flux, plus les paramètres de dates de soins et le recul en date de flux souhaités."
+    },
+    {
+      "id": 6,
+      "name": "Prise en charge de la maladie de Crohn et de la rectocolite hémorragique",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/prise-en-charge-des-patients-atteints-de-la-maladie-de-crohn",
+      "authorType": "Plateforme de données",
+      "objectives": [
+        "Requête à la demande"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS",
+        "SQL"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Décrire la prise en charge des patients atteints de maladies inflammatoires de l'intestin (Crohn, rectocolite hémorragique).",
+      "dataDescription": "Données en tableaux (remboursements de soins).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/hdh/requ-tes-la-demande/afa",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il repère les patients atteints de maladies inflammatoires de l'intestin (Crohn, rectocolite hémorragique) en reprenant les règles de la cartographie CNAM : avoir une ALD avec le code de la maladie, et/ou une hospitalisation pour ce motif sur 5 ans. Il produit ensuite un tableau de bord : nombre de patients par âge/sexe, carte géographique, types d'hospitalisations, chirurgies, arrêts maladie, médicaments et maladies associées.",
+      "limits": "Non validé (pas de données externes). Pas de maintenance. Les arrêts maladie ne peuvent pas être reliés avec certitude à la maladie.",
+      "inclusion": "Personnes en ALD pour Crohn ou rectocolite (codes K50/K51), et/ou hospitalisées pour ce motif (diagnostic principal, relié ou associé).",
+      "exclusion": "Non précisé au-delà de ces critères.",
+      "inputData": "Base principale du SNDS (accès permanent CNAM) : ALD + PMSI MCO et SSR. Codes CIM-10 K50 (Crohn) et K51 (rectocolite hémorragique). Tables de séjours et de diagnostics du PMSI. Année 2021."
+    },
+    {
+      "id": 7,
+      "name": "deidcm – pseudonymisation de fichiers DICOM",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/bibliotheque-doutils-de-pseudonymisation-dattributs-et-de",
+      "authorType": "Start-up",
+      "objectives": [
+        "Pseudonymisation / anonymisation"
+      ],
+      "medicalDomains": [
+        "Cancers",
+        "Radiologie et imagerie médicale"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données d'imagerie",
+        "Données tabulaires",
+        "Texte libre"
+      ],
+      "validation": "Validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Anonymiser les images médicales : masquer les infos personnelles et effacer les textes visibles sur le cliché (lecture automatique OCR). Conçu pour mammographies, adaptable.",
+      "dataDescription": "Images radiologiques + données en tableaux + texte libre.",
+      "context": "Imagerie médicale (mammographies), fichiers DICOM",
+      "repoUrl": "https://github.com/Epiconcept-Paris/deidcm",
+      "licence": "MIT",
+      "lastUpdate": "Juin 2024 (v0.0.3)",
+      "howItWorks": "Il anonymise des fichiers d'imagerie médicale (format DICOM) en deux temps : il efface les informations personnelles dans la fiche technique de l'image, puis il lit l'image elle-même avec une reconnaissance automatique de texte (OCR) pour effacer les noms ou dates écrits directement sur le cliché.",
+      "limits": "Approche « best effort » : il garantit le filtrage des données sensibles mais ne respecte pas à 100 % le standard officiel DICOM. Conçu d'abord pour les mammographies.",
+      "inclusion": "Fichiers DICOM, surtout des mammographies ; utilisable sur d'autres types d'images.",
+      "exclusion": "Aucun (outil de traitement d'image).",
+      "inputData": "Fichiers d'imagerie médicale au format DICOM (.dcm), principalement mammographies (modalité MG) : à la fois les attributs (métadonnées) du fichier et l'image (pixels). Données tabulaires et texte libre associés. Testé sur mammographies du CRCDC-Occitanie et la base publique CMMD."
+    },
+    {
+      "id": 8,
+      "name": "Extract-Metadata – extraction de métadonnées",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/extract-metadata-extraction-de-metadonnees-partir-dune-base",
+      "authorType": "Autre",
+      "objectives": [
+        "Autre"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données d'imagerie",
+        "Données tabulaires"
+      ],
+      "validation": "Validé",
+      "maintenance": "Régulière",
+      "summary": "Extraire automatiquement les métadonnées (infos descriptives) d'une base de données et de fichiers d'imagerie DICOM.",
+      "dataDescription": "Images médicales + données en tableaux.",
+      "context": "Bases tabulaires et images médicales (DICOM)",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/hdh/extract_metadata",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il parcourt une base faite de fichiers tableaux (.csv) et d'images médicales (.dcm) et récupère automatiquement leurs « métadonnées » (les informations qui décrivent chaque fichier). Il range le tout dans des fichiers JSON : un global pour les tableaux, un par image. Cela donne une vue d'ensemble du contenu de la base.",
+      "limits": "Il ne lit que la description des fichiers, pas leur contenu médical. Conçu autour d'un projet précis (Precision Predict), à adapter pour d'autres bases.",
+      "inclusion": "Les fichiers .csv et les images DICOM (.dcm) de la base.",
+      "exclusion": "Aucun.",
+      "inputData": "Une base composée de fichiers tabulaires au format .csv et d'images médicales DICOM (.dcm). Fichier de configuration (config.yaml) pour les chemins. Un mode test est fourni avec des fichiers synthétiques."
+    },
+    {
+      "id": 9,
+      "name": "Programmes d'extraction des données du SNDS (accès permanent)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/programmes-dextraction-des-donnees-du-snds-acces-permanent",
+      "authorType": "Organisme de recherche",
+      "objectives": [
+        "Ciblage BP-SNDS",
+        "Manipulation / transformation BP-SNDS",
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Boîte à outils pour extraire, cibler et transformer les données du SNDS (sur accès permanent au portail).",
+      "dataDescription": "Données en tableaux (remboursements de soins).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/Drugs-Safe-R/Outils_SNDS",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est une boîte à outils de petits programmes réutilisables (macros) qui simplifient l'extraction du SNDS. Chaque macro fait une chose : sortir les médicaments délivrés, les hospitalisations, les ALD, les actes, les dispositifs médicaux… On l'appelle avec quelques paramètres (codes, période, population) et elle renvoie le tableau correspondant. Un module crée aussi un identifiant patient unique fiabilisé.",
+      "limits": "Pas de test de performance ; validation par avis d'experts. Conçu pour l'accès permanent au portail SNDS.",
+      "inclusion": "Les données du SNDS correspondant aux paramètres choisis par l'utilisateur.",
+      "exclusion": "Le module « référentiel » écarte les identifiants incohérents : données d'âge/sexe aberrantes, dates de décès impossibles, jumeaux de même sexe.",
+      "inputData": "SNDS en accès permanent : DCIR (ER_PRS_F, ER_PHA_F, référentiel IR_PHA_R), PMSI, ALD. Pour le module Référentiel : tables référentiel bénéficiaire IR_BEN_R et IR_BEN_R_ARC, tables d'affiliations annuelles CONSOPAT, causes de décès KI_CCI_R. Codes ATC, CIP, UCD, CIM-10, CCAM, LPP selon la macro appelée."
+    },
+    {
+      "id": 10,
+      "name": "Jointure d'une table avec les référentiels bénéficiaires (IR_BEN_R)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/jointure-dune-table-avec-les-referentiels-beneficiaires",
+      "authorType": "Agence",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Validé",
+      "maintenance": "Régulière",
+      "summary": "Rattacher à une table les informations des personnes (référentiel bénéficiaires) de façon fiable.",
+      "dataDescription": "Données en tableaux : fichier des bénéficiaires (identité, droits).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/sant-publique-france/requ-tes-types/programme-dcir_prestations_medicaments.sas",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un modèle de requête qui rattache à votre table de patients les informations officielles des personnes (le « référentiel bénéficiaires » : identité, données socio-démographiques), en gérant correctement l'identifiant du patient pour éviter les erreurs.",
+      "limits": "Outil technique de jointure, pas d'analyse médicale. À adapter selon l'identifiant choisi.",
+      "inclusion": "S'applique à toute la période couverte par le DCIR.",
+      "exclusion": "Aucun.",
+      "inputData": "Votre table de patients + les référentiels bénéficiaires IR_BEN_R et IR_BEN_R_ARC du DCIR. Identifiant du bénéficiaire = couple (BEN_NIR_PSA, BEN_RNG_GEM). Variables socio-démographiques choisies par l'utilisateur. Toute la période du DCIR."
+    },
+    {
+      "id": 11,
+      "name": "Requête-type : sélection des ALD exonérantes actives une année donnée",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/requete-type-de-selection-dald-exonerantes-actives-une-annee",
+      "authorType": "Agence",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non précisé",
+      "maintenance": "Régulière",
+      "summary": "Modèle de requête pour sélectionner les personnes en ALD (remboursée à 100 %) active une année donnée.",
+      "dataDescription": "Données en tableaux (droits ALD).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/sant-publique-france/requ-tes-types/programme-ald_select_par_code_cim.sas",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un modèle de requête qui sélectionne les personnes ayant une « affection longue durée » (maladie chronique reconnue, remboursée à 100 %) active une année donnée. La sélection se fait par code de maladie et motif d'exonération, à une date de référence fixe pour obtenir toujours le même résultat.",
+      "limits": "Il est déconseillé de sélectionner par numéro d'ALD (sa définition a changé dans le temps). Les exonérations ne sont complètes qu'environ 6 mois après la fin de la période.",
+      "inclusion": "Personnes avec une ALD exonérante active l'année choisie, pour les codes de maladie retenus.",
+      "exclusion": "Non précisé (hors codes et période choisis).",
+      "inputData": "Référentiel médicalisé IR_IMB_R. En entrée : la liste des codes CIM-10 des pathologies visées et l'année d'intérêt. Sélection par code CIM-10 et motif d'exonération, à une date de point fixe. Identifiant (BEN_NIR_PSA, BEN_RNG_GEM)."
+    },
+    {
+      "id": 12,
+      "name": "Requête-type : sélection de séjours hospitaliers (PMSI-MCO)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/requete-type-de-selection-de-sejours-dans-le-pmsi-mco-en",
+      "authorType": "Agence",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non précisé",
+      "maintenance": "Régulière",
+      "summary": "Modèle de requête pour sélectionner des séjours à l'hôpital selon leur diagnostic.",
+      "dataDescription": "Données en tableaux (séjours + diagnostics).",
+      "context": "Base principale du SNDS (PMSI-MCO)",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/sant-publique-france/requ-tes-types/programme-pmsi_mco_select_sejours_par_diag.sas",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un modèle de requête qui sélectionne les séjours à l'hôpital (court séjour) selon le diagnostic. On choisit des codes de maladie et un mode de sélection (diagnostic principal seul, ou principal + relié, ou + associés) et une période. Le résultat donne une ligne par séjour avec ses caractéristiques.",
+      "limits": "Outil de sélection générique, à paramétrer. Mis à jour quand le PMSI change.",
+      "inclusion": "Séjours hospitaliers MCO contenant les codes de diagnostic choisis, sur la période choisie.",
+      "exclusion": "Non précisé (hors codes et période).",
+      "inputData": "PMSI-MCO (tables des séjours et des diagnostics). En entrée : les codes diagnostics CIM-10, le mode de sélection (diagnostic principal seul / principal ou relié / principal, relié ou associés) et la période. Identifiant NIR_ANO_17."
+    },
+    {
+      "id": 13,
+      "name": "Requête-type : sélection de prestations en ville (DCIR) avec actes affinés",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/requete-type-de-selection-de-prestations-dans-le-dcir",
+      "authorType": "Agence",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Validé",
+      "maintenance": "Régulière",
+      "summary": "Modèle de requête pour sélectionner des soins de ville en détaillant le codage des actes.",
+      "dataDescription": "Données en tableaux (prestations remboursées).",
+      "context": "Base principale du SNDS (DCIR)",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/sant-publique-france/requ-tes-types/programme-dcir_prestations_medicaments.sas2",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un modèle de requête qui sélectionne des soins de ville remboursés en allant chercher le détail du codage (par exemple les médicaments ou les actes). La version fournie cible les médicaments mais s'adapte à d'autres prestations. Elle gère les corrections de remboursement et traite les données mois par mois.",
+      "limits": "À adapter selon la prestation visée. Outil technique.",
+      "inclusion": "Prestations du DCIR correspondant aux codes choisis ; population générale ou population déjà constituée.",
+      "exclusion": "Non précisé.",
+      "inputData": "DCIR + une table d'actes affinés de codage (ex. médicaments). En entrée : les codes à sélectionner et la période. Population cible = ensemble des bénéficiaires ou population déjà constituée. Identifiant (BEN_NIR_PSA, BEN_RNG_GEM)."
+    },
+    {
+      "id": 14,
+      "name": "Bassins Industriels et Santé (BIS) – Asthme de l'enfant",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/bassins-industriels-et-sante-bis-asthme-de-lenfant",
+      "authorType": "Agence",
+      "objectives": [
+        "Autre"
+      ],
+      "medicalDomains": [
+        "Enfants et Pédiatrie",
+        "Maladies respiratoires"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Données tabulaires"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Étudier les variations géographiques et temporelles de l'asthme de l'enfant en France et les facteurs géographiques (zones industrielles).",
+      "dataDescription": "Données en tableaux.",
+      "context": "Étude territoriale (données géographiques et sanitaires)",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/sant-publique-france/projet-bis",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il rassemble des données venant de sources très différentes (météo, pollution de l'air, pression industrielle, agriculture, densité de population, défaveur sociale, accès aux médecins, hospitalisations) et les met toutes au même format et à la même échelle (la commune). On obtient une grande base prête à analyser pour étudier où et quand l'asthme de l'enfant augmente, et quels facteurs géographiques jouent.",
+      "limits": "Non validé. Pas de maintenance. C'est surtout un travail de mise en forme avant l'analyse statistique.",
+      "inclusion": "Données environnementales et sanitaires par commune, en France, environ 2012-2022.",
+      "exclusion": "Aucun.",
+      "inputData": "Données tabulaires multi-sources, ramenées à l'échelle de la commune : Météo France 2012-2022, surfaces agricoles et indice de traitement (Solagro), densité des communes INSEE 2019, pollution de l'air Ineris 2012-2022, indicateurs de pression industrielle (Ineris), périnatalité SNDS/PMSI 2013-2022, passages aux urgences Sursaud 2012-2022, indice de défaveur sociale Fdep Inserm 2015, accessibilité aux médecins DREES 2019."
+    },
+    {
+      "id": 15,
+      "name": "Dépistage des cancers féminins (Hauts-de-France)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/depistage-des-cancers-feminins-chez-les-femmes-residant-dans",
+      "authorType": "Non précisé",
+      "objectives": [
+        "Requête à la demande"
+      ],
+      "medicalDomains": [
+        "Cancers",
+        "Autre"
+      ],
+      "languages": [
+        "SAS",
+        "SQL"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Analyser le recours au dépistage des cancers féminins (sein, col de l'utérus) chez les femmes des Hauts-de-France.",
+      "dataDescription": "Données en tableaux (remboursements de soins).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/hdh/requ-tes-la-demande/depistage-des-cancers-feminins",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il compte les femmes des Hauts-de-France ayant fait un dépistage des cancers féminins. Il cherche dans les remboursements les actes précis : frottis et test HPV pour le col de l'utérus, mammographies pour le sein. Il distingue dépistage organisé et individuel, et produit des tableaux par âge et par nombre d'examens.",
+      "limits": "Non validé. Pas de maintenance. Le taux de recours n'est pas fourni (il faut le croiser avec la population INSEE). Ne voit pas les dépistages non remboursés.",
+      "inclusion": "Femmes des Hauts-de-France : 30 à 65 ans pour le col de l'utérus (2018-2023), 50 à 64 ans pour le sein (2018-2022).",
+      "exclusion": "Femmes avec un cancer du sein actif ou sous surveillance, ou ayant eu certains actes individuels, sont retirées des comptages concernés.",
+      "inputData": "Base principale du SNDS : DCIR + PMSI MCO (séjours, actes et consultations externes). Codes CCAM précis : col de l'utérus JKQX426, ZZQX603, JKQX147, ZZQX628 ; sein QEQK004, QEQK001, QEQK005. Top « cancer du sein » de la cartographie pour les exclusions. Femmes des Hauts-de-France, 2018-2022/2023."
+    },
+    {
+      "id": 16,
+      "name": "Analyse des IVG en établissements de santé (2019-2023)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/analyse-des-interruptions-volontaires-de-grossesse-ivg-en",
+      "authorType": "Plateforme de données",
+      "objectives": [
+        "Requête à la demande"
+      ],
+      "medicalDomains": [
+        "Périnatalité et Santé reproductive",
+        "Autre"
+      ],
+      "languages": [
+        "SAS",
+        "SQL"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Mesurer et décrire les IVG réalisées en établissements de santé en France métropolitaine entre 2019 et 2023.",
+      "dataDescription": "Données en tableaux (séjours et actes).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/hdh/requ-tes-la-demande/interruptions-volontaires-de-grossesse",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il compte les interruptions volontaires de grossesse réalisées à l'hôpital en France métropolitaine entre 2019 et 2023, à partir des séjours hospitaliers. Il repère ces séjours via des codes précis (diagnostic + acte chirurgical ou médicamenteux) et classe par âge, méthode, lieu de résidence et lieu de prise en charge.",
+      "limits": "Ne compte que les IVG faites en établissement (pas celles en ville), ce qui sous-estime le total. Les ré-interventions ne sont pas retirées (léger sur-comptage). France métropolitaine seulement. Non validé.",
+      "inclusion": "Séjours hospitaliers MCO avec un diagnostic d'IVG (O04 / GHM 14Z08Z) et un acte d'IVG.",
+      "exclusion": "IVG médicamenteuses faites en ville ; DROM-COM et femmes résidant à l'étranger. Effectifs inférieurs à 11 masqués.",
+      "inputData": "PMSI-MCO du SNDS. Repérage par GHM 14Z08Z et/ou diagnostic principal commençant par O04, combiné aux actes JNJD0020 (IVG chirurgicale) ou JNJP0010 (IVG médicamenteuse). France métropolitaine, 2019-2023."
+    },
+    {
+      "id": 17,
+      "name": "Dépistage biologique de l'insuffisance rénale chronique (IRC)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/depistage-biologique-de-linsuffisance-renale-chronique-irc",
+      "authorType": "Administrations et ministère",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Maladies cardio-vasculaires",
+        "Diabète",
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Repérer les personnes ayant une insuffisance rénale chronique via les analyses biologiques remboursées.",
+      "dataDescription": "Données en tableaux (actes de biologie remboursés).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/ars/depistage-biologique-insuffisance-renale-chronique",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il constitue d'abord un groupe de personnes « à risque » (diabétiques et/ou hypertendues, repérées par leurs médicaments), puis il compte chez elles les analyses biologiques liées aux reins (créatinine, albuminurie…) remboursées dans l'année. Il décline les résultats par âge, sexe, département et région pour mesurer le dépistage de la maladie rénale.",
+      "limits": "Le SNDS contient les analyses facturées mais pas leurs résultats : on ne connaît donc pas le stade réel de la maladie. Le groupe mélange des personnes à risque et des malades déjà avancés. Non validé sur base externe.",
+      "inclusion": "Personnes avec au moins 3 délivrances par an (ou 2 dont 1 grand conditionnement) de traitements du diabète et/ou de l'hypertension.",
+      "exclusion": "Personnes sous traitement anti-cholestérol seul (non incluses), ce qui sous-estime un peu la population.",
+      "inputData": "Base principale du SNDS (DCIR + PMSI MCO), 2015-2022. Délivrances de médicaments du diabète et de l'hypertension (codes ATC/CIP de la cartographie). Actes de biologie remboursés liés aux reins (créatinine, clairance, urée, albuminurie, protéinurie). Macro de correction des communes requise."
+    },
+    {
+      "id": 18,
+      "name": "Cartographie des pathologies et des dépenses (version G12)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/cartographie-des-pathologies-et-des-depenses-version-g12",
+      "authorType": "Administrations et ministère",
+      "objectives": [
+        "Ciblage BP-SNDS",
+        "Cartographie des pathologies",
+        "Requête à la demande"
+      ],
+      "medicalDomains": [
+        "Cancers",
+        "Maladies cardio-vasculaires",
+        "Diabète",
+        "Maladies neurodégénératives",
+        "Santé mentale et Psychiatrie",
+        "Périnatalité et Santé reproductive",
+        "Maladies respiratoires",
+        "Maladies infectieuses",
+        "Autre"
+      ],
+      "languages": [
+        "R"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Régulière",
+      "summary": "Classer la population par maladie et estimer les dépenses associées au niveau national (carte des pathologies, version G12).",
+      "dataDescription": "Données en tableaux (remboursements, toutes pathologies).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/cnam/cartographie-des-pathologies",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un grand ensemble d'algorithmes qui classe toute la population par maladie (une soixantaine de catégories : diabète, cancers, maladies du cœur…) à partir des médicaments, ALD et hospitalisations, avec un recul jusqu'à 5 ans. Il crée plus de 300 indicateurs par an et répartit les dépenses de l'Assurance Maladie par maladie. Une même personne peut avoir plusieurs maladies.",
+      "limits": "Non validé globalement (seul le diabète a été comparé à une référence externe). Très volumineux et complexe à faire tourner. La version G12 couvre 2015-2023.",
+      "inclusion": "Chaque maladie a ses propres règles (médicaments spécifiques, ALD, hospitalisations). Couvre tous les régimes.",
+      "exclusion": "Propre à chaque algorithme de maladie (non détaillé ici).",
+      "inputData": "Base principale du SNDS : PMSI 2011-2023, ALD 2014-2023, DCIR 2014-2023, tous régimes. Médicaments spécifiques, ALD et hospitalisations selon les règles propres à chaque pathologie. Référentiels fournis pour la version G12."
+    },
+    {
+      "id": 19,
+      "name": "Prédiction par IA de la progression de la sténose aortique (PROGRESSA)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/prediction-amelioree-par-lia-de-la-progression-de-la-stenose",
+      "authorType": "Établissement d'enseignement supérieur",
+      "objectives": [
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Maladies cardio-vasculaires"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Base principale",
+        "Données d'imagerie",
+        "Données tabulaires"
+      ],
+      "validation": "Validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Prédire par IA l'aggravation du rétrécissement de la valve aortique (sténose aortique).",
+      "dataDescription": "Données en tableaux + images médicales.",
+      "context": "Données cliniques + imagerie cardiovasculaire",
+      "repoUrl": "https://github.com/spell00/PROGRESSA",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il utilise l'intelligence artificielle pour prévoir si le rétrécissement de la valve aortique (sténose aortique) va s'aggraver. Il apprend à partir du suivi annuel (données cliniques + échographies du cœur) de 303 patients et compare plusieurs modèles pour prédire l'évolution à 2 et 5 ans. Le meilleur modèle atteint une bonne performance.",
+      "limits": "Développé sur une cohorte limitée (303 patients) d'une étude précise ; performances à confirmer sur d'autres populations.",
+      "inclusion": "Patients de l'étude PROGRESSA suivis pour une sténose aortique, avec le suivi requis.",
+      "exclusion": "Non précisé.",
+      "inputData": "Jeu de données PROGRESSA : 303 patients avec suivi clinique et échocardiographique annuel (données tabulaires) ; données d'imagerie associées. (N'utilise pas le SNDS.)"
+    },
+    {
+      "id": 20,
+      "name": "EDS-Pseudo – pseudonymisation de documents médicaux",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/eds-pseudo-pseudonymisation-de-documents-medicaux",
+      "authorType": "Établissement de santé",
+      "objectives": [
+        "Pseudonymisation / anonymisation"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Texte libre"
+      ],
+      "validation": "Validé",
+      "maintenance": "Régulière",
+      "summary": "Masquer automatiquement les informations personnelles dans les comptes-rendus médicaux en texte libre.",
+      "dataDescription": "Texte libre (documents médicaux).",
+      "context": "Comptes-rendus médicaux (texte)",
+      "repoUrl": "https://github.com/aphp/eds-pseudo",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il lit des comptes-rendus médicaux écrits en texte libre et masque automatiquement les informations qui permettent d'identifier une personne (noms, dates, adresses…). Il combine des règles écrites à la main et de l'apprentissage automatique pour les repérer.",
+      "limits": "Le modèle entraîné sur les vraies données de l'AP-HP n'est pas public (données sensibles) : seuls des modèles fictifs et un générateur de fausses données sont fournis. Validé en interne sur les données AP-HP.",
+      "inclusion": "Documents médicaux en texte libre (testés sur ceux de l'AP-HP).",
+      "exclusion": "Aucun.",
+      "inputData": "Documents médicaux en texte libre (modèle interne entraîné sur 3682 documents de l'entrepôt AP-HP, non public). Pour le public : modèles fictifs et un générateur de jeu de données synthétique fournis."
+    },
+    {
+      "id": 21,
+      "name": "EDS-PDF – extraction de texte depuis des PDF",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/eds-pdf-extraction-dinformations-textuelles-partir-de",
+      "authorType": "Établissement de santé",
+      "objectives": [
+        "Autre"
+      ],
+      "medicalDomains": [
+        "Tous"
+      ],
+      "languages": [
+        "Python",
+        "Autre"
+      ],
+      "dataTypes": [
+        "Autre"
+      ],
+      "validation": "Validé",
+      "maintenance": "Régulière",
+      "summary": "Extraire automatiquement le texte utile de documents PDF en repérant les vraies zones de texte.",
+      "dataDescription": "Documents PDF (texte et mise en page).",
+      "context": "Documents PDF médicaux",
+      "repoUrl": "https://github.com/aphp/edspdf",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est une boîte à outils qui extrait le texte utile de documents PDF (par exemple des comptes-rendus). Il découpe la page, classe les zones de texte (titre, corps, en-tête…) et recolle le résultat, en s'appuyant au besoin sur de l'apprentissage automatique pour mieux découper.",
+      "limits": "Le modèle entraîné sur les données AP-HP n'est pas public ; l'utilisateur doit fournir ses propres données. Validé en interne.",
+      "inclusion": "Documents PDF (notamment cliniques).",
+      "exclusion": "Aucun.",
+      "inputData": "Documents PDF (l'utilisateur fournit ses propres fichiers). Le modèle entraîné sur les documents de l'entrepôt AP-HP n'est pas public."
+    },
+    {
+      "id": 22,
+      "name": "EDS-NLP – traitement du langage pour notes cliniques (FR)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/eds-nlp-framework-de-nlp-modulaire-et-rapide-compatible-avec",
+      "authorType": "Établissement de santé",
+      "objectives": [
+        "Autre"
+      ],
+      "medicalDomains": [
+        "Tous"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Autre"
+      ],
+      "validation": "Non précisé",
+      "maintenance": "Régulière",
+      "summary": "Boîte à outils pour analyser automatiquement les textes médicaux en français (extraction d'infos des notes cliniques).",
+      "dataDescription": "Texte libre (notes cliniques).",
+      "context": "Comptes-rendus médicaux (texte, français)",
+      "repoUrl": "https://github.com/aphp/edsnlp",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est une boîte à outils pour analyser automatiquement des textes médicaux en français. Elle enchaîne des « briques » (règles ou modèles d'apprentissage) pour extraire des informations des notes cliniques : repérer une maladie, une date, dire si un symptôme est présent ou absent, etc.",
+      "limits": "Le statut de validation dépend de chaque brique (voir la documentation). Outil générique : la qualité dépend de l'usage.",
+      "inclusion": "Tout document texte, surtout les comptes-rendus médicaux en français.",
+      "exclusion": "Aucun.",
+      "inputData": "Documents texte, notamment comptes-rendus médicaux en français (l'utilisateur fournit ses propres textes). Formats d'entrée/sortie supportés : BRAT, JSON, Parquet, pandas, Spark."
+    },
+    {
+      "id": 23,
+      "name": "EPICODIAB – typage du diabète dans le SNDS",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/epicodiab-developpement-dun-algorithme-de-typage-du-diabete",
+      "authorType": "Bureau d'étude",
+      "objectives": [
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Diabète"
+      ],
+      "languages": [
+        "SAS",
+        "R"
+      ],
+      "dataTypes": [
+        "Non précisé"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Non précisé",
+      "summary": "Distinguer les types de diabète dans le SNDS à partir d'une cohorte reliée aux dossiers médicaux.",
+      "dataDescription": "Données en tableaux (remboursements + dossiers médicaux électroniques).",
+      "context": "Base principale du SNDS, cohorte appariée",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/iqvia/epicodiab",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il sert à distinguer le type de diabète (type 1 ou type 2) chez les adultes diabétiques du SNDS. Il a appris sur une cohorte où le type est connu (dossiers de médecins généralistes reliés au SNDS) : à partir d'environ 200 indices tirés des remboursements, un modèle calcule une probabilité d'être de type 1 ; au-dessus de 0,5, le patient est classé type 1.",
+      "limits": "Peut se tromper sur les cas « intermédiaires » (type 1 âgé, type 2 jeune sous insuline). Il suppose que le diagnostic du médecin est exact. Développé avant le Covid et certains nouveaux médicaments : à mettre à jour. Non validé en population générale.",
+      "inclusion": "Adultes vivant avec un diabète (selon l'algo de la cartographie), affiliés au régime général, France métropolitaine.",
+      "exclusion": "Diabète gestationnel (code O24) et résidents des DOM-TOM.",
+      "inputData": "Dossiers médicaux électroniques (EMR IQVIA de médecins généralistes) appariés au SNDS, 2010-2019. Environ 200 prédicteurs dérivés du SNDS : socio-démographie, ALD, comorbidités, hospitalisations, délivrances de médicaments, dispositifs médicaux, tests biologiques, actes et consultations (collectés sur 1 à 5 ans avant la date de référence)."
+    },
+    {
+      "id": 24,
+      "name": "PICOLA – conversion d'images d'anatomopathologie",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/picola",
+      "authorType": "Non précisé",
+      "objectives": [
+        "Autre"
+      ],
+      "medicalDomains": [
+        "Cancers"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données d'imagerie"
+      ],
+      "validation": "Validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Chaîne automatisée (Airflow) pour convertir les lames d'anatomopathologie numérisées vers un format réutilisable (TIFF pyramidal).",
+      "dataDescription": "Images médicales (lames numérisées).",
+      "context": "Imagerie médicale (anatomopathologie)",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/hdh/picola",
+      "licence": "Apache 2.0",
+      "lastUpdate": "Juillet 2025 (v1.0)",
+      "howItWorks": "C'est une chaîne automatisée (via l'outil Airflow) qui convertit des lames d'anatomopathologie numérisées (de très gros fichiers image) vers un format standard réutilisable (TIFF pyramidal). On dépose les images dans un dossier, on lance le traitement, il convertit chaque fichier (et décompresse les .zip si besoin), puis nettoie les fichiers temporaires.",
+      "limits": "Outil purement technique de conversion d'images (pas d'analyse médicale). Il tourne en local et demande une installation (Linux, Airflow).",
+      "inclusion": "Images aux formats ndpi, mrxs, svs, scn, bif, tiff/tif ou zip.",
+      "exclusion": "Aucun.",
+      "inputData": "Images d'anatomopathologie numérisées aux formats ndpi, mrxs, svs, scn, bif, tiff, tif ou zip (MRXS zippé). Sortie : images au format TIFF pyramidal. Fichier config.env pour les paramètres."
+    },
+    {
+      "id": 25,
+      "name": "Suivi de la vaccination contre la coqueluche (femmes enceintes)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/suivi-de-la-vaccination-pour-la-coqueluche-des-femmes",
+      "authorType": "Administrations et ministère",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Périnatalité et Santé reproductive"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Mesurer la couverture vaccinale contre la coqueluche chez les femmes enceintes via les vaccins remboursés.",
+      "dataDescription": "Données en tableaux (vaccins délivrés / remboursés).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/ars/suivi-de-la-vaccination-pour-la-coqueluche-des-femmes-enceintes",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il repère les femmes enceintes dans le SNDS et leur période de grossesse, puis vérifie si elles ont reçu un vaccin contre la coqueluche pendant la grossesse (repéré par le code du vaccin en pharmacie). Il calcule un taux de vaccination par mois d'accouchement et par territoire (département, région, France).",
+      "limits": "Non validé (pas de données externes). Basé sur les vaccins délivrés en pharmacie de ville. Il a besoin d'autres outils pour fonctionner (Magic Loop, macro de correction des communes).",
+      "inclusion": "Femmes enceintes identifiées dans le SNDS ; vaccins coqueluche délivrés pendant la grossesse (spécialités REPEVAX, BOOSTRIXTETRA).",
+      "exclusion": "Grossesses en double ou incohérentes retirées (ex. grossesse qui commence avant la fin d'une précédente, fausse couche présumée).",
+      "inputData": "SNDS — tables ER_PRS_F et ER_PHA_F (prestations et pharmacie), IR_MAT_R (grossesse), IR_BEN_R (bénéficiaire), IR_PHA_R (référentiel médicaments). Vaccins coqueluche : code ATC J07CA02 (spécialités REPEVAX, BOOSTRIXTETRA). Nécessite la macro Magic Loop et une macro de correction des communes."
+    },
+    {
+      "id": 26,
+      "name": "Analyse démographique et indemnités journalières (populations en ALD)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/analyse-demographiques-et-denombrements-des-indemnites",
+      "authorType": "Plateforme de données",
+      "objectives": [
+        "Requête à la demande"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Décrire plusieurs populations en ALD et compter leurs arrêts maladie indemnisés (indemnités journalières), France entière.",
+      "dataDescription": "Données en tableaux (indemnités journalières, droits ALD).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/hdh/requ-tes-la-demande/analyse-demographiques-et-denombrements-des-indemnites-journalieres-pour-risque-maladie-de-plusieurs-populations-en-ald-actives-en-france-entiere",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il étudie plusieurs groupes de personnes en affection longue durée (années 2016, 2020, 2021) et compte, sur 4 ans, leurs arrêts maladie indemnisés (indemnités journalières), en plus d'indicateurs d'âge et de sexe. Il détaille par tranches du nombre de jours d'arrêt, pour des sous-groupes comme ALD cancer, diabète, mucoviscidose.",
+      "limits": "Non validé. Les indemnités ne peuvent pas être reliées avec certitude à l'ALD. Les décès pendant la période ne sont pas pris en compte. Effectifs inférieurs à 11 masqués.",
+      "inclusion": "Personnes avec une ALD active l'année étudiée (et sous-groupes : cancer débutant, diabète, mucoviscidose, invalidité 3 ans après).",
+      "exclusion": "Non précisé au-delà des définitions de groupes.",
+      "inputData": "DCIR — table ER_PRS_F : indemnités journalières comptées via PRS_ACT_NBR, filtrées par PRS_NAT_REF (codes 6013-6135) et EXO_MTF (42, 44, 46). ALD via IMB_ALD_DTD/IMB_ALD_DTF, code ALD et IMB_ETM_NAT (invalidité). Années 2016, 2020, 2021 (+ suivi N+3)."
+    },
+    {
+      "id": 27,
+      "name": "Délivrance de psychotropes hypnotiques",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/delivrance-psychotropes-hypnotiques",
+      "authorType": "Organisme de recherche",
+      "objectives": [
+        "Ciblage BP-SNDS",
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS",
+        "SQL"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Repérer et compter les personnes à qui sont délivrés des somnifères (psychotropes hypnotiques).",
+      "dataDescription": "Données en tableaux (médicaments délivrés).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/observatoire-r-gional-de-sant/delivrance-psychotropes-hypnotiques",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il construit un indicateur du nombre de personnes ayant des « troubles du sommeil chroniques » à l'échelle de la commune, en repérant celles à qui on délivre régulièrement des somnifères (psychotropes hypnotiques) dans les remboursements. Il calcule des taux bruts et standardisés.",
+      "limits": "Non validé, pas de maintenance. La liste des médicaments est à réactualiser. Il repère un usage de médicaments, pas un diagnostic médical.",
+      "inclusion": "Personnes avec des délivrances de somnifères répondant aux critères définis sur la période.",
+      "exclusion": "Non précisé.",
+      "inputData": "Base principale du SNDS (DCIR). Délivrances de médicaments psychotropes à visée hypnotique (liste de médicaments définie). Échelle de la commune ; calcul de taux bruts et standardisés."
+    },
+    {
+      "id": 28,
+      "name": "Génération terrasse",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/generation-terrasse",
+      "authorType": "Organisme de recherche",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Autre"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Repositionner des points situés dans des bâtiments vers l'extérieur (par symétrie) pour modéliser les terrasses de bars/restaurants et leur bruit (impact sur le sommeil).",
+      "dataDescription": "Fichiers cartographiques (points et bâtiments, format Shapefile).",
+      "context": "Données géographiques (SIG), bruit / sommeil",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/bruitparif/generation-terrasses",
+      "licence": "Apache 2.0",
+      "lastUpdate": "Mai 2025",
+      "howItWorks": "C'est un outil cartographique : il déplace des points situés « dans » des bâtiments vers l'extérieur (par symétrie par rapport au mur le plus proche), pour ensuite modéliser les terrasses de bars/restaurants et le bruit qu'elles génèrent (utile pour étudier l'impact sur le sommeil). Il lit deux couches géographiques (points + bâtiments) et exporte les points corrigés.",
+      "limits": "Déplacement purement géométrique : un point peut atterrir dans un autre bâtiment ou un endroit non voulu. Il ne tient pas compte du terrain réel. Il suppose une terrasse pour chaque établissement (approximation). Non validé.",
+      "inclusion": "Couches géographiques (points et bâtiments au format Shapefile), en système métrique.",
+      "exclusion": "Aucun.",
+      "inputData": "Deux couches géographiques au format Shapefile : une couche de points (localisations) et une couche de polygones (bâtiments), dans un système projeté en mètres (EPSG). En complément : base SIRENE pour repérer les établissements festifs (codes NAF 56.10A restauration et 56.30Z débits de boisson)."
+    },
+    {
+      "id": 29,
+      "name": "Statistiques d'exposition au bruit (méthode CNOSSOS)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/developpement-dalgorithmes-pour-calculer-des-statistiques",
+      "authorType": "Organisme de recherche",
+      "objectives": [
+        "Autre"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données tabulaires"
+      ],
+      "validation": "Non précisé",
+      "maintenance": "Non précisé",
+      "summary": "Calculer des statistiques d'exposition de la population au bruit, selon les méthodes réglementaires (ex. CNOSSOS) imposées par la directive européenne.",
+      "dataDescription": "Données en tableaux.",
+      "context": "Données environnementales (bruit), niveau territorial",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/bruitparif/exposition-sonore-des-populations",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il estime combien de personnes sont exposées à différents niveaux de bruit sur un territoire. Il répartit la population des bâtiments vers des « récepteurs sonores » selon plusieurs méthodes, puis additionne par zone géographique (commune, quartier, intercommunalité) et par plage de bruit, en suivant les méthodes réglementaires (ex. CNOSSOS) de la directive européenne.",
+      "limits": "Dépend de la qualité des fichiers de départ (il corrige doublons et anomalies). Outil statistique et géographique.",
+      "inclusion": "Couches de bâtiments et de récepteurs sonores du territoire étudié.",
+      "exclusion": "Aucun.",
+      "inputData": "Couches géographiques : bâtiments et récepteurs sonores avec leurs niveaux de bruit (Lden, Ln, Ld, Le). Données tabulaires géolocalisées. Méthodes réglementaires (ex. CNOSSOS) imposées par la directive européenne."
+    },
+    {
+      "id": 30,
+      "name": "Combicancer – mise au format OMOP du SNDS",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/combicancer-pipeline-de-pre-processing-et-de-reformatage-en",
+      "authorType": "Organisme de recherche",
+      "objectives": [
+        "Manipulation / transformation BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Cancers"
+      ],
+      "languages": [
+        "Python",
+        "SQL",
+        "Autre"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Préparer et reformater les données du SNDS vers le format standard international OMOP, pour les études sur les cancers.",
+      "dataDescription": "Données en tableaux (remboursements).",
+      "context": "Base principale du SNDS (cancers)",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/institut-curie/combicancer",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est une chaîne de préparation des données du SNDS pour la recherche sur le cancer. Comme le volume est énorme, il utilise un traitement réparti sur plusieurs machines, convertit les fichiers dans un format rapide, modélise les liens entre tables par un « graphe » pour les regrouper automatiquement autour du patient, nettoie les données (doublons, valeurs aberrantes) et produit des tables finales prêtes à analyser, dans un format proche d'OMOP.",
+      "limits": "Non validé sur source externe (contrôles internes de qualité seulement). Problèmes hérités des données brutes (codes mal formés, dates manquantes). Correspondance imparfaite avec les référentiels de médicaments. Nécessite une grosse infrastructure technique.",
+      "inclusion": "Données SNDS 2010-2024 (remboursements de ville, hôpital, causes de décès).",
+      "exclusion": "Nettoyage : doublons et identifiants problématiques (ex. « jumeaux de même sexe ») retirés.",
+      "inputData": "SNDS 2010-2024, fichiers CSV convertis en Parquet : DCIR (IR_BEN_R, ER_PRS_F, ER_CAM_F, ER_PHA_F, ER_UCD_F, IR_PHA_R, IR_IMB_R, ER_TIP_F, ER_BIO_F), PMSI (tables T_MCO*, T_SSR*, T_HAD*), CépiDc (KI_CCI_R, KI_ECD_R). Stockage Azure, traitement PySpark."
+    },
+    {
+      "id": 31,
+      "name": "SndsTools – fonctions d'extraction réutilisables",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/sndstools-developpement-de-fonctions-dextraction",
+      "authorType": "Autorités administratives indépendantes et consultatives",
+      "objectives": [
+        "Ciblage BP-SNDS",
+        "Manipulation / transformation BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Cancers",
+        "Maladies cardio-vasculaires",
+        "Diabète",
+        "Maladies neurodégénératives",
+        "Santé mentale et Psychiatrie",
+        "Périnatalité et Santé reproductive",
+        "Maladies respiratoires",
+        "Maladies infectieuses",
+        "Enfants et Pédiatrie",
+        "Personnes âgées et Gériatrie",
+        "Autre"
+      ],
+      "languages": [
+        "R",
+        "SQL"
+      ],
+      "dataTypes": [
+        "Base principale",
+        "Données tabulaires"
+      ],
+      "validation": "Validé",
+      "maintenance": "Régulière",
+      "summary": "Boîte à fonctions paramétrables et réutilisables pour extraire facilement les périmètres les plus courants des études SNDS.",
+      "dataDescription": "Données en tableaux (PMSI, DCIR, ALD).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://github.com/SNDStoolers/sndsTools",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est une boîte à fonctions (paquet R) qui simplifie les extractions les plus courantes du SNDS : consultations, médicaments, ALD, hospitalisations. Chaque fonction est paramétrable et applique automatiquement les bonnes pratiques de la CNAM (requêtes mois par mois, filtres qualité). Elle marche sur le portail SNDS et aussi sur d'autres bases.",
+      "limits": "Maintenu par les auteurs sans garantie. Pas d'algorithme statistique, donc pas de mesure de performance ; validation par relecture et tests.",
+      "inclusion": "Données SNDS correspondant aux paramètres choisis (profil accès permanent privilégié).",
+      "exclusion": "Filtres qualité usuels pour écarter les lignes indésirables (ex. remontées « pour information » dans le DCIR).",
+      "inputData": "SNDS sur le portail CNAM (profil 108, accès permanent) : consultations DCIR, médicaments DCIR, ALD, hospitalisations MCO, consultations MCO. Fonctionne aussi sur une base DuckDB (tests). Filtres qualité CNAM appliqués automatiquement."
+    },
+    {
+      "id": 32,
+      "name": "Base RAC – restes à charge après Assurance Maladie",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/la-base-rac-restes-charge-en-sante-apres-assurance-maladie",
+      "authorType": "Administrations et ministère",
+      "objectives": [
+        "Manipulation / transformation BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "R",
+        "Spark"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Validé",
+      "maintenance": "Régulière",
+      "summary": "Construire une base mesurant le reste à charge des patients (ce qui reste à payer après le remboursement obligatoire).",
+      "dataDescription": "Données en tableaux (remboursements et restes à charge).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://git.drees.fr/drees_code_public/outils/restes-a-charge-snds/-/tree/main",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il construit une base qui mesure, pour chaque personne et par type de soin, le « reste à charge » : ce qui reste à payer après le remboursement de l'Assurance Maladie obligatoire (avant la mutuelle). Il rapproche les données de ville et d'hôpital, regroupe les dépenses par poste de soin et ajoute des infos sur la personne (âge, sexe, ALD, CMU-C…).",
+      "limits": "Ne couvre pas le médico-social (EHPAD…) ni certains régimes spéciaux. Il s'arrête avant la complémentaire santé (mutuelle).",
+      "inclusion": "Toutes les personnes ayant consommé au moins un soin dans l'année, tous régimes.",
+      "exclusion": "Dépenses du médico-social ; bénéficiaires des régimes du Sénat et de l'Assemblée nationale (risque de ré-identification).",
+      "inputData": "SNDS : DCIR/DCIRS (soins de ville et établissements privés) + PMSI (MCO, HAD, psychiatrie, SSR pour les établissements publics). Indexée sur l'année, tous régimes. Caractéristiques individuelles (âge, sexe, résidence, ALD, CMU-C/CSS) et montants (dépense, base de remboursement, remboursé, reste à charge)."
+    },
+    {
+      "id": 33,
+      "name": "Code du catalogue de métadonnées de la PDS",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/code-du-catalogue-de-metadonnees-de-la-pds",
+      "authorType": "Établissement de santé",
+      "objectives": [
+        "Autre"
+      ],
+      "medicalDomains": [
+        "Tous"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Autre"
+      ],
+      "validation": "Validé",
+      "maintenance": "Régulière",
+      "summary": "Code qui fait fonctionner le catalogue de métadonnées de la Plateforme des Données de Santé (description des bases disponibles).",
+      "dataDescription": "Métadonnées (descriptions des bases).",
+      "context": "Métadonnées de bases de santé",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/hdh/catalogue-de-metadonnees/",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est le code qui fait tourner le catalogue de métadonnées de la Plateforme des Données de Santé : il structure, vérifie et publie les descriptions des bases de données de santé selon un standard européen (Health DCAT-AP), pour qu'elles soient compréhensibles et compatibles entre institutions.",
+      "limits": "Outil d'infrastructure (pas d'analyse de données de santé). N'accepte pas de contributions externes. Conformité au standard exigeante.",
+      "inclusion": "Des métadonnées (descriptions de jeux de données de santé).",
+      "exclusion": "Aucun.",
+      "inputData": "Métadonnées de jeux de données de santé décrites au format standard Health DCAT-AP (RDF/DCAT). Pas de données de santé individuelles. Stockage RDF (Fuseki) et S3."
+    },
+    {
+      "id": 34,
+      "name": "MORS – rapprochement du statut vital",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/mors-module-dobservation-et-de-rapprochement-statut-vital",
+      "authorType": "Établissement de santé",
+      "objectives": [
+        "Identification / dépistage",
+        "Requête à la demande"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Autre"
+      ],
+      "validation": "Validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Retrouver et rapprocher le statut vital des patients (vivant / décédé) pour les études.",
+      "dataDescription": "Données en tableaux (identités, statut vital).",
+      "context": "Données d'établissement de santé (entrepôt)",
+      "repoUrl": "https://gitlab.com/ricdc/outils/mors",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il retrouve automatiquement quels patients d'un hôpital sont décédés, en rapprochant le fichier des patients avec le fichier national des décès de l'INSEE. Comme les noms et dates peuvent être écrits différemment, il mesure la ressemblance entre les informations et valide un rapprochement quand elle est suffisante, en limitant les comparaisons aux profils plausibles pour aller vite.",
+      "limits": "Repose sur la qualité des données d'identité. Un rapprochement reste une estimation (avec des seuils de tolérance). Validé sur les CHU de Rennes, Nantes et Angers.",
+      "inclusion": "Patients d'un établissement à rapprocher du fichier des décès de l'INSEE.",
+      "exclusion": "Aucun (c'est un appariement, pas une sélection médicale).",
+      "inputData": "Le fichier des personnes décédées de l'INSEE (data.gouv.fr) + les données patients d'un entrepôt de données de santé (EDS). En appui : le Code Officiel Géographique et la base officielle des codes postaux."
+    },
+    {
+      "id": 35,
+      "name": "Elixhauser – score de comorbidité (PMSI-MCO)",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/elixhauser-calcul-du-score-de-comorbidite-delixhauser-partir",
+      "authorType": "Bureau d'étude",
+      "objectives": [
+        "Autre"
+      ],
+      "medicalDomains": [
+        "Cancers",
+        "Maladies cardio-vasculaires",
+        "Santé mentale et Psychiatrie",
+        "Maladies respiratoires",
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Non précisé",
+      "maintenance": "Ad-hoc",
+      "summary": "Calculer le score de comorbidité d'Elixhauser (poids des maladies associées d'un patient) à partir des hospitalisations.",
+      "dataDescription": "Données en tableaux (séjours + diagnostics).",
+      "context": "Base principale du SNDS (PMSI-MCO)",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/cemka/elixhauser",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il calcule le « score d'Elixhauser », une mesure du poids des maladies associées (comorbidités) d'un patient. À partir des diagnostics d'hospitalisation, il repère 31 catégories de maladies, note leur présence ou absence, puis calcule plusieurs scores et classe le patient en niveau de risque (de faible à très élevé).",
+      "limits": "Basé uniquement sur les diagnostics hospitaliers : il rate ce qui n'est pas codé à l'hôpital. Validation interne seulement.",
+      "inclusion": "Séjours hospitaliers MCO avec leurs diagnostics, sur une période réglable (365 jours par défaut).",
+      "exclusion": "Non précisé.",
+      "inputData": "PMSI-MCO : diagnostics principaux (DP), reliés (DR) et associés (DAS) en codes CIM-10, plus les dates de séjour. Fenêtre d'antériorité paramétrable (365 jours par défaut)."
+    },
+    {
+      "id": 36,
+      "name": "Générateur de bases synthétiques du SNIIRAM",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/outil-de-generation-de-bases-de-donnees-synthetiques-et",
+      "authorType": "Organisme de recherche",
+      "objectives": [
+        "Autre"
+      ],
+      "medicalDomains": [
+        "Cancers",
+        "Maladies cardio-vasculaires",
+        "Diabète",
+        "Maladies neurodégénératives",
+        "Santé mentale et Psychiatrie",
+        "Périnatalité et Santé reproductive",
+        "Maladies respiratoires",
+        "Maladies infectieuses",
+        "Enfants et Pédiatrie",
+        "Personnes âgées et Gériatrie",
+        "Autre"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données synthétiques"
+      ],
+      "validation": "En cours de validation",
+      "maintenance": "Ad-hoc",
+      "summary": "Produire de fausses bases de données réalistes du SNDS pour tester des programmes sans utiliser de vraies données personnelles.",
+      "dataDescription": "Données en tableaux synthétiques (fictives mais réalistes).",
+      "context": "Données synthétiques du SNDS",
+      "repoUrl": "https://gitlab.inria.fr/tguyet/medtrajectory_datagen",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il fabrique de fausses bases de données réalistes du SNDS, sans aucune donnée réelle. On lui donne des distributions de population et des descriptions de parcours de soins typiques (ex. après un AVC, ou cancer du sein), et il génère des patients fictifs cohérents qui respectent le format du SNIIRAM. Utile pour s'entraîner ou tester des logiciels.",
+      "limits": "Réalisme suffisant pour la technique et l'enseignement, mais pas pour des conclusions médicales. Génération limitée à un an. Pas d'interface (il faut coder un scénario en Python). En cours de validation.",
+      "inclusion": "S'appuie sur des données publiques agrégées (OpenDAMIR, INSEE, ATIH).",
+      "exclusion": "Aucune donnée individuelle réelle n'est utilisée.",
+      "inputData": "Données publiques agrégées (aucune donnée individuelle réelle) pour estimer les distributions : OpenDAMIR, liste des structures et personnels de l'assurance maladie, démographie INSEE, activité hospitalière ATIH (année 2016). Plus des descriptions de parcours de soins typiques (scénarios codés en Python)."
+    },
+    {
+      "id": 37,
+      "name": "Identification des poussées de sclérose en plaques",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/validation-et-amelioration-dun-algorithme-didentification-de",
+      "authorType": "Organisme de recherche",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Maladies neurodégénératives"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Repérer les poussées (crises) de sclérose en plaques dans les données de remboursement ; validation et amélioration de l'algorithme.",
+      "dataDescription": "Données en tableaux (soins et traitements remboursés).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/bpe/dionisos",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il repère les « poussées » (crises) de sclérose en plaques chez des patients traités, en combinant deux signaux du SNDS : les hospitalisations avec un diagnostic compatible, et/ou les délivrances de corticoïdes à forte dose. L'algorithme a d'abord été créé avec des experts, puis amélioré et validé en le comparant à une base clinique de référence (OFSEP).",
+      "limits": "Fiable chez les patients qui débutent un traitement de la SEP ; beaucoup moins fiable en population large (il repère alors trop de fausses poussées). Pas de maintenance.",
+      "inclusion": "Patients atteints de SEP et traités pour la SEP (1re délivrance d'un traitement, sans autre traitement SEP auparavant).",
+      "exclusion": "Deux poussées à moins de 31 jours comptent pour une seule ; des répétitions très rapprochées et régulières ne sont pas comptées comme de nouvelles poussées.",
+      "inputData": "SNDS : DCIR (prestations + tables affinées des médicaments — corticoïdes Solumedrol 1000 mg, Solumedrol 120 mg, Medrol 100 mg) et PMSI MCO (séjours, diagnostics DP/DR/DAS, GHM). Trois tables à préparer en entrée : PATIENTS, MEDICAMENTS, HOSPITALISATIONS. Validation via le registre clinique OFSEP."
+    },
+    {
+      "id": 38,
+      "name": "Prédiction de la sévérité (NIHSS) des AVC ischémiques",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/developpement-et-validation-dun-algorithme-de-prediction-de",
+      "authorType": "Agence",
+      "objectives": [
+        "Manipulation / transformation BP-SNDS",
+        "Cartographie des pathologies"
+      ],
+      "medicalDomains": [
+        "Maladies cardio-vasculaires"
+      ],
+      "languages": [
+        "R"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "Validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Estimer la gravité d'un AVC ischémique (score NIHSS) à partir des données d'hospitalisation.",
+      "dataDescription": "Données en tableaux (séjours + diagnostics, CIM-10 I63).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/sant-publique-france/alia-1",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il estime la gravité d'un AVC à l'échelle nationale (pas pour un individu). Il repère les séjours hospitaliers pour AVC, reconstitue le séjour complet, calcule une probabilité de décès à 10 jours, puis convertit cette probabilité en gravité estimée (score NIHSS) grâce à un registre où le vrai score est connu (registre de Brest).",
+      "limits": "Pensé pour une carte nationale, pas pour évaluer un patient. Ne sera probablement pas maintenu. Il tend à sous-estimer les AVC les plus graves.",
+      "inclusion": "Séjours hospitaliers pour AVC ischémique (code I63), personnes de 16 ans et plus, France hors DROM, 2012-2019.",
+      "exclusion": "DROM ; moins de 16 ans.",
+      "inputData": "SNDS : PMSI MCO (tables T_MCOaaA/B/C/D/UM, MEDTHROMBO, CSTC/FBSTC/FMSTC), référentiel IR_BEN_R, IR_IMB_R, actes ER_CAM_F ; code CIM-10 I63 (AVC ischémique). Plus le registre des AVC de Brest (mise en équation NIHSS/mortalité) et celui de Dijon (validation). France hors DROM, 16 ans et +, 2012-2019."
+    },
+    {
+      "id": 39,
+      "name": "Ciblage des patients atteints d'hépatite virale B et C chronique",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/algorithmes-de-ciblage-de-patients-atteints-dhepatite-virale",
+      "authorType": "Organisme de recherche",
+      "objectives": [
+        "Ciblage BP-SNDS",
+        "Manipulation / transformation BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Maladies infectieuses"
+      ],
+      "languages": [
+        "Python",
+        "R",
+        "SQL"
+      ],
+      "dataTypes": [
+        "Base principale",
+        "Données tabulaires"
+      ],
+      "validation": "En cours de validation",
+      "maintenance": "Ad-hoc",
+      "summary": "Repérer les patients atteints d'hépatite B ou C chronique et les profils associés (cirrhose, porteurs sains, hépatite Delta).",
+      "dataDescription": "Données en tableaux (soins, traitements, diagnostics).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/iplesp/hepaviralgo",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il repère les patients atteints d'hépatite B ou C chronique (et des profils associés : cirrhose, porteurs « sains », hépatite Delta) avec de l'apprentissage automatique. Le modèle a appris sur une cohorte où le vrai statut est connu (HEPATHER reliée au SNDS), en combinant automatiquement de nombreux signaux (diagnostics, analyses, médicaments, ALD) pour donner un score de probabilité par patient.",
+      "limits": "Validé seulement en population restreinte ; la généralisation à toute la population n'est pas garantie (travaux en cours). En attendant la mise à jour d'un logiciel, seule une version simplifiée est disponible côté SNDS.",
+      "inclusion": "Patients du SNDS ; le modèle se règle selon la précision/sensibilité voulue.",
+      "exclusion": "Non précisé.",
+      "inputData": "Base principale du SNDS + données tabulaires : diagnostics CIM-10, tests biologiques, médicaments spécifiques de l'hépatite B/C, ALD. Modèle entraîné sur la cohorte HEPATHER appariée au SNDS (statut réel connu). Poids de modèle XGBoost réutilisés en population générale."
+    },
+    {
+      "id": 40,
+      "name": "Repérage des personnes avec limitations psychiques/cognitives",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/developpement-dun-algorithme-de-reperage-des-individus-0",
+      "authorType": "Organisme de recherche",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Santé mentale et Psychiatrie"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "En cours de validation",
+      "maintenance": "Ad-hoc",
+      "summary": "Repérer dans les données de l'Assurance Maladie les personnes ayant des limitations psychiques, intellectuelles ou cognitives.",
+      "dataDescription": "Données en tableaux (soins et traitements remboursés).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/irdes/rish/pic",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Il cherche dans les remboursements les personnes ayant des limitations psychiques, intellectuelles ou cognitives. Il utilise des « traceurs » (codes de maladies, médicaments, actes, hospitalisations, séjours en rééducation, établissements médico-sociaux) pour classer chaque personne entre « limitation avérée », « potentielle » ou « pas de limitation » sur 2012-2019, puis produit un indicateur oui/non pour 2019.",
+      "limits": "En cours de validation (comparé à une enquête, VQS 2021). Il repère un risque à partir des soins, pas un diagnostic de handicap. Version SAS ; Python prévu.",
+      "inclusion": "Personnes avec des traceurs de limitation psychique/cognitive dans le SNDS (2012-2019).",
+      "exclusion": "Personnes sans aucun traceur = « pas de limitation ».",
+      "inputData": "SNDS 2012-2019 : codes traceurs CIM issus des motifs d'exonération (ALD, invalidité, longue maladie) ou d'hospitalisation (MCO, SSR, RIMP), médicaments (CIP13 et UCD13), actes NGAP, séjours SSR. Données des établissements médico-sociaux (ESMS). Nomenclatures fournies en fichiers Excel. Comparé à l'enquête VQS 2021."
+    },
+    {
+      "id": 41,
+      "name": "Repérage des personnes avec limitations motrices ou organiques",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/developpement-dun-algorithme-de-reperage-des-individus-avec",
+      "authorType": "Autre",
+      "objectives": [
+        "Ciblage BP-SNDS"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "SAS"
+      ],
+      "dataTypes": [
+        "Base principale"
+      ],
+      "validation": "En cours de validation",
+      "maintenance": "Ad-hoc",
+      "summary": "Repérer dans les données de l'Assurance Maladie les personnes ayant des limitations motrices ou organiques (handicap physique).",
+      "dataDescription": "Données en tableaux (soins et traitements remboursés).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://gitlab.com/healthdatahub/boas/irdes/rish/handicap-moteur-et-organique",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "Même principe que l'outil précédent, mais pour les limitations motrices ou organiques (handicap physique). Il combine des traceurs (maladies, dispositifs médicaux, actes de chirurgie, kiné, médicaments, hospitalisations, rééducation) pour classer chaque personne (« avérée / potentielle / pas de limitation ») sur 2012-2019 et créer un indicateur oui/non.",
+      "limits": "En cours de validation. Il estime un risque de handicap à partir des soins, pas un diagnostic. Version SAS ; Python prévu.",
+      "inclusion": "Personnes avec des traceurs de limitation motrice/organique dans le SNDS (2012-2019).",
+      "exclusion": "Personnes sans traceur = « pas de limitation ». Des règles « cassent ou réparent » certains diagnostics selon les actes (ex. une opération qui corrige le problème).",
+      "inputData": "SNDS 2012-2019 : codes traceurs CIM (exonérations, hospitalisations MCO/SSR/RIMP), dispositifs médicaux (LPP), actes de chirurgie (CCAM), actes de kiné et d'infirmier, médicaments (CIP13/UCD13), séjours SSR. Tables de correspondance qui « cassent » ou « réparent » certains diagnostics selon les actes."
+    },
+    {
+      "id": 42,
+      "name": "Data Challenge TissueNet – lésions des biopsies du col de l'utérus",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/data-challenge-tissuenet-detection-des-lesions-dans-les",
+      "authorType": "Société savante",
+      "objectives": [
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Cancers"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données d'imagerie"
+      ],
+      "validation": "Validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Concours d'IA pour détecter automatiquement les lésions sur les biopsies du col de l'utérus.",
+      "dataDescription": "Images médicales (lames de biopsie).",
+      "context": "Imagerie médicale (biopsies)",
+      "repoUrl": "https://github.com/drivendataorg/tissuenet-cervical-biopsies",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un concours d'intelligence artificielle : les participants ont créé des modèles qui regardent des lames de biopsie du col de l'utérus numérisées et détectent automatiquement la lésion la plus grave présente, parmi 4 niveaux. Ce sont les algorithmes gagnants qui sont partagés.",
+      "limits": "Issus d'une compétition (2020). Détails et maintenance dans les dépôts GitHub des lauréats. Pas de maintenance.",
+      "inclusion": "Lames de biopsie du col de l'utérus numérisées (base d'images annotées, classes équilibrées).",
+      "exclusion": "Les lames de conisation n'ont pas été incluses dans la compétition.",
+      "inputData": "Environ 5 000 lames de biopsie du col de l'utérus numérisées (format tif, haute résolution), annotées selon 4 classes de gravité, réparties en jeux d'apprentissage, de test et de validation. Base partiellement ouverte sur data.gouv.fr."
+    },
+    {
+      "id": 43,
+      "name": "Data Challenge VisioMel – récidive des mélanomes",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/data-challenge-visiomel-prediction-de-la-recidive-5-ans-des",
+      "authorType": "Société savante",
+      "objectives": [
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Cancers"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données d'imagerie"
+      ],
+      "validation": "Validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Concours d'IA pour prédire la récidive à 5 ans des mélanomes (cancer de la peau) localisés.",
+      "dataDescription": "Images médicales.",
+      "context": "Imagerie médicale (dermatologie)",
+      "repoUrl": "https://github.com/drivendataorg/visiomel-melanoma",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un concours d'IA : prédire si un mélanome (cancer de la peau) localisé va récidiver dans les 5 ans, à partir d'images de lames de mélanome numérisées et de quelques données cliniques (âge, sexe, localisation, épaisseur, ulcération…). Les algorithmes gagnants sont partagés.",
+      "limits": "Issus d'une compétition (2023). En moyenne, environ 73 % des rechutes et 75 % des non-rechutes correctement détectées. Détails dans les dépôts GitHub.",
+      "inclusion": "Patients avec un mélanome localisé (stade 0 à IIC), diagnostiqués entre 2012 et 2016, avec au moins 5 ans de suivi.",
+      "exclusion": "Non précisé (hors critères ci-dessus).",
+      "inputData": "Images de lames de mélanome numérisées (haute résolution) + variables cliniques : âge, sexe, localisation, épaisseur de Breslow, présence d'ulcération, antécédents. Patients de la base RIC-Mel, mélanome localisé (stade 0-IIC), diagnostiqués 2012-2016, ≥5 ans de suivi."
+    },
+    {
+      "id": 44,
+      "name": "sndskit – moteur de recherche de codes dans le SNDS",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/sndskit-moteur-de-recherche-pour-extraire-les-donnees-de",
+      "authorType": "Industriel santé",
+      "objectives": [
+        "Manipulation / transformation BP-SNDS",
+        "Cartographie des pathologies",
+        "Requête à la demande"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Base principale",
+        "Données tabulaires"
+      ],
+      "validation": "Validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Moteur de recherche pour retrouver facilement les données par codes : maladies (CIM), actes (CCAM), traitements (ATC).",
+      "dataDescription": "Données en tableaux (codes CIM, CCAM, ATC).",
+      "context": "Base principale du SNDS",
+      "repoUrl": "https://github.com/Epiconcept-Paris/sndskit",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un moteur de recherche pour retrouver facilement, dans les tables du SNDS, les lignes correspondant à des codes : maladies (CIM-10), actes médicaux (CCAM), médicaments (ATC). On écrit les codes voulus dans un seul fichier, et l'outil parcourt les tables et extrait les données, de façon optimisée pour aller vite et économiser l'espace disque.",
+      "limits": "Pas de validation systématique pour l'instant (mais résultats cohérents avec des registres de cancer sur un cas testé). Version 0.1.",
+      "inclusion": "Données SNDS du périmètre du projet, selon les codes définis par l'utilisateur.",
+      "exclusion": "Aucun.",
+      "inputData": "Tables du SNDS du périmètre du projet (PMSI, DCIR, CépiDc). En entrée : un seul fichier (var_def) listant les codes à requêter — maladies (CIM-10/ICD), actes (CCAM), médicaments (ATC)."
+    },
+    {
+      "id": 45,
+      "name": "Data Challenge D-IA-GNO-DENT – maladies rares dentaires/faciales",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/d-ia-gno-dent-data-challenge-favoriser-lacces-la-detection",
+      "authorType": "Établissement / Fédération de santé",
+      "objectives": [
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données d'imagerie"
+      ],
+      "validation": "Validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Concours d'IA pour aider à détecter tôt les maladies rares à composante dentaire, orale et faciale.",
+      "dataDescription": "Images médicales.",
+      "context": "Imagerie médicale (dentaire/facial)",
+      "repoUrl": "https://github.com/Trustii-team/Diagnodent",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un concours d'IA pour détecter plus tôt les maladies rares qui s'expriment dans la bouche, les dents et le visage, à partir de photos de cavités buccales. Le but est de raccourcir le parcours de diagnostic. Les algorithmes gagnants sont partagés.",
+      "limits": "Issus d'une compétition (2023). Données non anonymisables (accès sur demande). Détails dans les dépôts GitHub.",
+      "inclusion": "Photographies de cavités buccales (base du challenge).",
+      "exclusion": "Non précisé.",
+      "inputData": "Base de photographies de cavités buccales (visage, bouche, dents). Données non anonymisables par nature : accès sur demande auprès du CHRU de Strasbourg."
+    },
+    {
+      "id": 46,
+      "name": "Allergen Chip Challenge – allergènes en cause",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/allergen-chip-challenge-identification-des-allergenes-en",
+      "authorType": "Société savante",
+      "objectives": [
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Autre"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données tabulaires"
+      ],
+      "validation": "Validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Concours d'IA pour identifier les allergènes responsables d'une réaction allergique à partir de tests biologiques.",
+      "dataDescription": "Données en tableaux (résultats de tests).",
+      "context": "Données biologiques (tests d'allergie)",
+      "repoUrl": "https://github.com/Trustii-team/AllergenChip",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un concours d'IA pour identifier quels allergènes sont responsables d'une réaction allergique et en prédire la gravité, en reliant l'historique clinique du patient à son profil immunologique (dosages d'anticorps). Les algorithmes gagnants sont partagés.",
+      "limits": "Issus d'une compétition (2023). Performances jusqu'à environ 80 %. Détails dans les dépôts GitHub.",
+      "inclusion": "4271 patients avec historique clinique et profil immunologique (données 2012-2023).",
+      "exclusion": "Non précisé.",
+      "inputData": "Données cliniques + profil immunologique (dosages d'anticorps IgE par puce) de 4 271 patients, données rétrospectives 2012-2023 (tabulaires). Base accessible en open data sur data.gouv.fr."
+    },
+    {
+      "id": 47,
+      "name": "Data Challenge DigiLut – rejet de greffe pulmonaire",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/data-challenge-digilut-amelioration-de-la-detection-du-rejet",
+      "authorType": "Établissement de santé",
+      "objectives": [
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Maladies respiratoires"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données d'imagerie"
+      ],
+      "validation": "Validé",
+      "maintenance": "Pas de maintenance",
+      "summary": "Concours d'IA pour améliorer la détection du rejet d'une greffe de poumon.",
+      "dataDescription": "Images médicales.",
+      "context": "Imagerie médicale (pneumologie)",
+      "repoUrl": "https://github.com/trustii-team/DigiLut",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un concours d'IA pour aider à détecter le rejet d'une greffe de poumon, en repérant sur des lames de biopsie bronchique numérisées les zones malades caractéristiques du rejet. Les algorithmes gagnants sont partagés.",
+      "limits": "Issus d'une compétition (2024). Problème reconnu comme difficile (diagnostic peu reproductible). Détails dans les dépôts GitHub.",
+      "inclusion": "Environ 2500 couples de lames de biopsies bronchiques de patients transplantés (hôpital Foch), en partie annotées par des experts.",
+      "exclusion": "Non précisé.",
+      "inputData": "Environ 2 500 couples de lames de biopsies bronchiques numérisées (haute résolution), de patients transplantés pulmonaires suivis à l'hôpital Foch, en partie annotées par un panel international de pathologistes."
+    },
+    {
+      "id": 48,
+      "name": "Data Challenge Cytolog-IA – diagnostic en hématologie",
+      "ficheUrl": "https://www.health-data-hub.fr/bibliotheque-ouverte-algorithmes-sante/data-challenge-cytolog-ia-automatisation-du-diagnostic-des",
+      "authorType": "Non précisé",
+      "objectives": [
+        "Identification / dépistage"
+      ],
+      "medicalDomains": [
+        "Cancers"
+      ],
+      "languages": [
+        "Python"
+      ],
+      "dataTypes": [
+        "Données d'imagerie"
+      ],
+      "validation": "Non validé",
+      "maintenance": "Ad-hoc",
+      "summary": "Concours d'IA pour automatiser le diagnostic des maladies du sang (hématologie biologique).",
+      "dataDescription": "Images médicales (cytologie).",
+      "context": "Imagerie médicale (hématologie)",
+      "repoUrl": "https://github.com/Trustii-team/Cytologia",
+      "licence": "",
+      "lastUpdate": "",
+      "howItWorks": "C'est un concours d'IA pour automatiser un examen d'hématologie : reconnaître et classer les globules blancs normaux ou anormaux à partir d'images au microscope de frottis sanguins, parmi 23 catégories. But : rendre cette expertise (réservée aujourd'hui à des centres spécialisés) accessible partout.",
+      "limits": "Non validé (algorithmes de compétition, clôturée début 2025). Détails dans les dépôts GitHub.",
+      "inclusion": "Environ 75 000 images de globules blancs annotées, issues de 23 centres hospitaliers francophones.",
+      "exclusion": "Non précisé.",
+      "inputData": "Environ 75 000 images de globules blancs (leucocytes) issues de frottis sanguins numérisés à fort grossissement, annotées selon 23 classes, provenant de 23 centres hospitaliers francophones."
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "_comment": "Donnees d'entree par outil BOAS. A fusionner dans boas_data.json par 'slug'. Champ: inputData.",
+  "count": 48,
+  "fields": [
+    "inputData"
+  ],
+  "tools": [
+    {
+      "slug": "ehden-persephone",
+      "name": "EHDEN / Persephone",
+      "inputData": "Base principale du SNDS, cohorte de 570 000 personnes tirées au hasard (2015-2021) : DCIR (2015-2021), PMSI (2015-2021), CépiDC (2015-2017), référentiel des bénéficiaires, référentiel médicalisé. Terminologies SNDS (CCAM, CSARR, NABM, LPP…) + terminologies internationales OMOP-CDM (téléchargées sur Athena) + correspondances Etalab et codes communes INSEE."
+    },
+    {
+      "slug": "algorithme-pour-construire-le-top-diabete-de-la-cartographie",
+      "name": "Top diabète – cartographie CNAM (G8, 2019)",
+      "inputData": "Base principale du SNDS : DCIR — table ER_PHA_F (délivrances de médicaments antidiabétiques, classe ATC A10), ER_PRS_F / ER_ETE_F (prestations) ; ALD (codes CIM-10 E10 à E14) ; PMSI-MCO (séjours, diagnostics DP/DR/DA). Fichier fourni medicaments_antidiabetiques_G8.csv. Tourne sur données synthétiques 2018-2019 (programme source CNAM : 2015-2019)."
+    },
+    {
+      "slug": "prise-en-charge-des-allergies-aux-pollens-dans-la-region",
+      "name": "Allergies aux pollens en Normandie",
+      "inputData": "DCIR uniquement. Délivrances de médicaments des classes ATC anti-allergie (liste de codes : D04AB, D05*, D07*, R01*, R03*, R05*, R06*, S01*…). Table EXTRACTION_PATIENTS2010TR pour la commune de résidence. Année de soins 2010, flux 2010-2013. Départements 14, 27, 50, 61, 76."
+    },
+    {
+      "slug": "indicateurs-sur-le-statut-dayant-droit-entre-2012-et-2020",
+      "name": "Statut d'ayant droit (2012-2020)",
+      "inputData": "DCIR — table ER_PRS_F (prestations, statut BEN_QAF_COD). Référentiel des bénéficiaires IR_BEN_R (sexe, année de naissance, régime via ORG_AFF_BEN). Identifiants BEN_NIR_PSA et BEN_NIR_ANO. Période 2012-2020, tous régimes."
+    },
+    {
+      "slug": "magic-loop",
+      "name": "Magic Loop",
+      "inputData": "Tables du DCIR du portail SNDS. En entrée : une requête écrite par l'utilisateur sur un seul mois de flux, plus les paramètres de dates de soins et le recul en date de flux souhaités."
+    },
+    {
+      "slug": "prise-en-charge-des-patients-atteints-de-la-maladie-de-crohn",
+      "name": "Maladie de Crohn et rectocolite hémorragique",
+      "inputData": "Base principale du SNDS (accès permanent CNAM) : ALD + PMSI MCO et SSR. Codes CIM-10 K50 (Crohn) et K51 (rectocolite hémorragique). Tables de séjours et de diagnostics du PMSI. Année 2021."
+    },
+    {
+      "slug": "bibliotheque-doutils-de-pseudonymisation-dattributs-et-de",
+      "name": "deidcm – pseudonymisation DICOM",
+      "inputData": "Fichiers d'imagerie médicale au format DICOM (.dcm), principalement mammographies (modalité MG) : à la fois les attributs (métadonnées) du fichier et l'image (pixels). Données tabulaires et texte libre associés. Testé sur mammographies du CRCDC-Occitanie et la base publique CMMD."
+    },
+    {
+      "slug": "extract-metadata-extraction-de-metadonnees-partir-dune-base",
+      "name": "Extract-Metadata",
+      "inputData": "Une base composée de fichiers tabulaires au format .csv et d'images médicales DICOM (.dcm). Fichier de configuration (config.yaml) pour les chemins. Un mode test est fourni avec des fichiers synthétiques."
+    },
+    {
+      "slug": "programmes-dextraction-des-donnees-du-snds-acces-permanent",
+      "name": "Programmes d'extraction SNDS (DRUGS-SAFER)",
+      "inputData": "SNDS en accès permanent : DCIR (ER_PRS_F, ER_PHA_F, référentiel IR_PHA_R), PMSI, ALD. Pour le module Référentiel : tables référentiel bénéficiaire IR_BEN_R et IR_BEN_R_ARC, tables d'affiliations annuelles CONSOPAT, causes de décès KI_CCI_R. Codes ATC, CIP, UCD, CIM-10, CCAM, LPP selon la macro appelée."
+    },
+    {
+      "slug": "jointure-dune-table-avec-les-referentiels-beneficiaires",
+      "name": "Jointure avec les référentiels bénéficiaires",
+      "inputData": "Votre table de patients + les référentiels bénéficiaires IR_BEN_R et IR_BEN_R_ARC du DCIR. Identifiant du bénéficiaire = couple (BEN_NIR_PSA, BEN_RNG_GEM). Variables socio-démographiques choisies par l'utilisateur. Toute la période du DCIR."
+    },
+    {
+      "slug": "requete-type-de-selection-dald-exonerantes-actives-une-annee",
+      "name": "Requête-type : ALD exonérantes",
+      "inputData": "Référentiel médicalisé IR_IMB_R. En entrée : la liste des codes CIM-10 des pathologies visées et l'année d'intérêt. Sélection par code CIM-10 et motif d'exonération, à une date de point fixe. Identifiant (BEN_NIR_PSA, BEN_RNG_GEM)."
+    },
+    {
+      "slug": "requete-type-de-selection-de-sejours-dans-le-pmsi-mco-en",
+      "name": "Requête-type : séjours hospitaliers (PMSI-MCO)",
+      "inputData": "PMSI-MCO (tables des séjours et des diagnostics). En entrée : les codes diagnostics CIM-10, le mode de sélection (diagnostic principal seul / principal ou relié / principal, relié ou associés) et la période. Identifiant NIR_ANO_17."
+    },
+    {
+      "slug": "requete-type-de-selection-de-prestations-dans-le-dcir",
+      "name": "Requête-type : prestations en ville (DCIR)",
+      "inputData": "DCIR + une table d'actes affinés de codage (ex. médicaments). En entrée : les codes à sélectionner et la période. Population cible = ensemble des bénéficiaires ou population déjà constituée. Identifiant (BEN_NIR_PSA, BEN_RNG_GEM)."
+    },
+    {
+      "slug": "bassins-industriels-et-sante-bis-asthme-de-lenfant",
+      "name": "Bassins Industriels et Santé – Asthme de l'enfant",
+      "inputData": "Données tabulaires multi-sources, ramenées à l'échelle de la commune : Météo France 2012-2022, surfaces agricoles et indice de traitement (Solagro), densité des communes INSEE 2019, pollution de l'air Ineris 2012-2022, indicateurs de pression industrielle (Ineris), périnatalité SNDS/PMSI 2013-2022, passages aux urgences Sursaud 2012-2022, indice de défaveur sociale Fdep Inserm 2015, accessibilité aux médecins DREES 2019."
+    },
+    {
+      "slug": "depistage-des-cancers-feminins-chez-les-femmes-residant-dans",
+      "name": "Dépistage des cancers féminins (Hauts-de-France)",
+      "inputData": "Base principale du SNDS : DCIR + PMSI MCO (séjours, actes et consultations externes). Codes CCAM précis : col de l'utérus JKQX426, ZZQX603, JKQX147, ZZQX628 ; sein QEQK004, QEQK001, QEQK005. Top « cancer du sein » de la cartographie pour les exclusions. Femmes des Hauts-de-France, 2018-2022/2023."
+    },
+    {
+      "slug": "analyse-des-interruptions-volontaires-de-grossesse-ivg-en",
+      "name": "Analyse des IVG en établissements (2019-2023)",
+      "inputData": "PMSI-MCO du SNDS. Repérage par GHM 14Z08Z et/ou diagnostic principal commençant par O04, combiné aux actes JNJD0020 (IVG chirurgicale) ou JNJP0010 (IVG médicamenteuse). France métropolitaine, 2019-2023."
+    },
+    {
+      "slug": "depistage-biologique-de-linsuffisance-renale-chronique-irc",
+      "name": "Dépistage biologique de l'insuffisance rénale (IRC)",
+      "inputData": "Base principale du SNDS (DCIR + PMSI MCO), 2015-2022. Délivrances de médicaments du diabète et de l'hypertension (codes ATC/CIP de la cartographie). Actes de biologie remboursés liés aux reins (créatinine, clairance, urée, albuminurie, protéinurie). Macro de correction des communes requise."
+    },
+    {
+      "slug": "cartographie-des-pathologies-et-des-depenses-version-g12",
+      "name": "Cartographie des pathologies et dépenses (G12)",
+      "inputData": "Base principale du SNDS : PMSI 2011-2023, ALD 2014-2023, DCIR 2014-2023, tous régimes. Médicaments spécifiques, ALD et hospitalisations selon les règles propres à chaque pathologie. Référentiels fournis pour la version G12."
+    },
+    {
+      "slug": "prediction-amelioree-par-lia-de-la-progression-de-la-stenose",
+      "name": "PROGRESSA – progression de la sténose aortique",
+      "inputData": "Jeu de données PROGRESSA : 303 patients avec suivi clinique et échocardiographique annuel (données tabulaires) ; données d'imagerie associées. (N'utilise pas le SNDS.)"
+    },
+    {
+      "slug": "eds-pseudo-pseudonymisation-de-documents-medicaux",
+      "name": "EDS-Pseudo – anonymisation de documents",
+      "inputData": "Documents médicaux en texte libre (modèle interne entraîné sur 3682 documents de l'entrepôt AP-HP, non public). Pour le public : modèles fictifs et un générateur de jeu de données synthétique fournis."
+    },
+    {
+      "slug": "eds-pdf-extraction-dinformations-textuelles-partir-de",
+      "name": "EDS-PDF – extraction de texte des PDF",
+      "inputData": "Documents PDF (l'utilisateur fournit ses propres fichiers). Le modèle entraîné sur les documents de l'entrepôt AP-HP n'est pas public."
+    },
+    {
+      "slug": "eds-nlp-framework-de-nlp-modulaire-et-rapide-compatible-avec",
+      "name": "EDS-NLP – analyse de texte médical (français)",
+      "inputData": "Documents texte, notamment comptes-rendus médicaux en français (l'utilisateur fournit ses propres textes). Formats d'entrée/sortie supportés : BRAT, JSON, Parquet, pandas, Spark."
+    },
+    {
+      "slug": "epicodiab-developpement-dun-algorithme-de-typage-du-diabete",
+      "name": "EPICODIAB – type de diabète (1 ou 2)",
+      "inputData": "Dossiers médicaux électroniques (EMR IQVIA de médecins généralistes) appariés au SNDS, 2010-2019. Environ 200 prédicteurs dérivés du SNDS : socio-démographie, ALD, comorbidités, hospitalisations, délivrances de médicaments, dispositifs médicaux, tests biologiques, actes et consultations (collectés sur 1 à 5 ans avant la date de référence)."
+    },
+    {
+      "slug": "picola",
+      "name": "PICOLA – conversion d'images d'anatomopathologie",
+      "inputData": "Images d'anatomopathologie numérisées aux formats ndpi, mrxs, svs, scn, bif, tiff, tif ou zip (MRXS zippé). Sortie : images au format TIFF pyramidal. Fichier config.env pour les paramètres."
+    },
+    {
+      "slug": "suivi-de-la-vaccination-pour-la-coqueluche-des-femmes",
+      "name": "Vaccination coqueluche des femmes enceintes",
+      "inputData": "SNDS — tables ER_PRS_F et ER_PHA_F (prestations et pharmacie), IR_MAT_R (grossesse), IR_BEN_R (bénéficiaire), IR_PHA_R (référentiel médicaments). Vaccins coqueluche : code ATC J07CA02 (spécialités REPEVAX, BOOSTRIXTETRA). Nécessite la macro Magic Loop et une macro de correction des communes."
+    },
+    {
+      "slug": "analyse-demographiques-et-denombrements-des-indemnites",
+      "name": "Indemnités journalières de populations en ALD",
+      "inputData": "DCIR — table ER_PRS_F : indemnités journalières comptées via PRS_ACT_NBR, filtrées par PRS_NAT_REF (codes 6013-6135) et EXO_MTF (42, 44, 46). ALD via IMB_ALD_DTD/IMB_ALD_DTF, code ALD et IMB_ETM_NAT (invalidité). Années 2016, 2020, 2021 (+ suivi N+3)."
+    },
+    {
+      "slug": "delivrance-psychotropes-hypnotiques",
+      "name": "Délivrance de psychotropes hypnotiques (sommeil)",
+      "inputData": "Base principale du SNDS (DCIR). Délivrances de médicaments psychotropes à visée hypnotique (liste de médicaments définie). Échelle de la commune ; calcul de taux bruts et standardisés."
+    },
+    {
+      "slug": "generation-terrasse",
+      "name": "Génération terrasse (bruit / sommeil)",
+      "inputData": "Deux couches géographiques au format Shapefile : une couche de points (localisations) et une couche de polygones (bâtiments), dans un système projeté en mètres (EPSG). En complément : base SIRENE pour repérer les établissements festifs (codes NAF 56.10A restauration et 56.30Z débits de boisson)."
+    },
+    {
+      "slug": "developpement-dalgorithmes-pour-calculer-des-statistiques",
+      "name": "Statistiques d'exposition au bruit (CNOSSOS)",
+      "inputData": "Couches géographiques : bâtiments et récepteurs sonores avec leurs niveaux de bruit (Lden, Ln, Ld, Le). Données tabulaires géolocalisées. Méthodes réglementaires (ex. CNOSSOS) imposées par la directive européenne."
+    },
+    {
+      "slug": "combicancer-pipeline-de-pre-processing-et-de-reformatage-en",
+      "name": "Combicancer – mise en forme du SNDS (cancer)",
+      "inputData": "SNDS 2010-2024, fichiers CSV convertis en Parquet : DCIR (IR_BEN_R, ER_PRS_F, ER_CAM_F, ER_PHA_F, ER_UCD_F, IR_PHA_R, IR_IMB_R, ER_TIP_F, ER_BIO_F), PMSI (tables T_MCO*, T_SSR*, T_HAD*), CépiDc (KI_CCI_R, KI_ECD_R). Stockage Azure, traitement PySpark."
+    },
+    {
+      "slug": "sndstools-developpement-de-fonctions-dextraction",
+      "name": "SndsTools – fonctions d'extraction réutilisables",
+      "inputData": "SNDS sur le portail CNAM (profil 108, accès permanent) : consultations DCIR, médicaments DCIR, ALD, hospitalisations MCO, consultations MCO. Fonctionne aussi sur une base DuckDB (tests). Filtres qualité CNAM appliqués automatiquement."
+    },
+    {
+      "slug": "la-base-rac-restes-charge-en-sante-apres-assurance-maladie",
+      "name": "Base RAC – restes à charge",
+      "inputData": "SNDS : DCIR/DCIRS (soins de ville et établissements privés) + PMSI (MCO, HAD, psychiatrie, SSR pour les établissements publics). Indexée sur l'année, tous régimes. Caractéristiques individuelles (âge, sexe, résidence, ALD, CMU-C/CSS) et montants (dépense, base de remboursement, remboursé, reste à charge)."
+    },
+    {
+      "slug": "code-du-catalogue-de-metadonnees-de-la-pds",
+      "name": "Code du catalogue de métadonnées de la PDS",
+      "inputData": "Métadonnées de jeux de données de santé décrites au format standard Health DCAT-AP (RDF/DCAT). Pas de données de santé individuelles. Stockage RDF (Fuseki) et S3."
+    },
+    {
+      "slug": "mors-module-dobservation-et-de-rapprochement-statut-vital",
+      "name": "MORS – rapprochement du statut vital",
+      "inputData": "Le fichier des personnes décédées de l'INSEE (data.gouv.fr) + les données patients d'un entrepôt de données de santé (EDS). En appui : le Code Officiel Géographique et la base officielle des codes postaux."
+    },
+    {
+      "slug": "elixhauser-calcul-du-score-de-comorbidite-delixhauser-partir",
+      "name": "Elixhauser – score de comorbidité",
+      "inputData": "PMSI-MCO : diagnostics principaux (DP), reliés (DR) et associés (DAS) en codes CIM-10, plus les dates de séjour. Fenêtre d'antériorité paramétrable (365 jours par défaut)."
+    },
+    {
+      "slug": "outil-de-generation-de-bases-de-donnees-synthetiques-et",
+      "name": "Générateur de bases synthétiques du SNIIRAM",
+      "inputData": "Données publiques agrégées (aucune donnée individuelle réelle) pour estimer les distributions : OpenDAMIR, liste des structures et personnels de l'assurance maladie, démographie INSEE, activité hospitalière ATIH (année 2016). Plus des descriptions de parcours de soins typiques (scénarios codés en Python)."
+    },
+    {
+      "slug": "validation-et-amelioration-dun-algorithme-didentification-de",
+      "name": "Poussées de sclérose en plaques (DIONISOS)",
+      "inputData": "SNDS : DCIR (prestations + tables affinées des médicaments — corticoïdes Solumedrol 1000 mg, Solumedrol 120 mg, Medrol 100 mg) et PMSI MCO (séjours, diagnostics DP/DR/DAS, GHM). Trois tables à préparer en entrée : PATIENTS, MEDICAMENTS, HOSPITALISATIONS. Validation via le registre clinique OFSEP."
+    },
+    {
+      "slug": "developpement-et-validation-dun-algorithme-de-prediction-de",
+      "name": "Sévérité des AVC ischémiques (NIHSS, ALIA1)",
+      "inputData": "SNDS : PMSI MCO (tables T_MCOaaA/B/C/D/UM, MEDTHROMBO, CSTC/FBSTC/FMSTC), référentiel IR_BEN_R, IR_IMB_R, actes ER_CAM_F ; code CIM-10 I63 (AVC ischémique). Plus le registre des AVC de Brest (mise en équation NIHSS/mortalité) et celui de Dijon (validation). France hors DROM, 16 ans et +, 2012-2019."
+    },
+    {
+      "slug": "algorithmes-de-ciblage-de-patients-atteints-dhepatite-virale",
+      "name": "Hépatites B et C chroniques (HepavirAlgo)",
+      "inputData": "Base principale du SNDS + données tabulaires : diagnostics CIM-10, tests biologiques, médicaments spécifiques de l'hépatite B/C, ALD. Modèle entraîné sur la cohorte HEPATHER appariée au SNDS (statut réel connu). Poids de modèle XGBoost réutilisés en population générale."
+    },
+    {
+      "slug": "developpement-dun-algorithme-de-reperage-des-individus-0",
+      "name": "Repérage des limitations psychiques / cognitives",
+      "inputData": "SNDS 2012-2019 : codes traceurs CIM issus des motifs d'exonération (ALD, invalidité, longue maladie) ou d'hospitalisation (MCO, SSR, RIMP), médicaments (CIP13 et UCD13), actes NGAP, séjours SSR. Données des établissements médico-sociaux (ESMS). Nomenclatures fournies en fichiers Excel. Comparé à l'enquête VQS 2021."
+    },
+    {
+      "slug": "developpement-dun-algorithme-de-reperage-des-individus-avec",
+      "name": "Repérage des limitations motrices / organiques",
+      "inputData": "SNDS 2012-2019 : codes traceurs CIM (exonérations, hospitalisations MCO/SSR/RIMP), dispositifs médicaux (LPP), actes de chirurgie (CCAM), actes de kiné et d'infirmier, médicaments (CIP13/UCD13), séjours SSR. Tables de correspondance qui « cassent » ou « réparent » certains diagnostics selon les actes."
+    },
+    {
+      "slug": "data-challenge-tissuenet-detection-des-lesions-dans-les",
+      "name": "Data Challenge TissueNet (col de l'utérus)",
+      "inputData": "Environ 5 000 lames de biopsie du col de l'utérus numérisées (format tif, haute résolution), annotées selon 4 classes de gravité, réparties en jeux d'apprentissage, de test et de validation. Base partiellement ouverte sur data.gouv.fr."
+    },
+    {
+      "slug": "data-challenge-visiomel-prediction-de-la-recidive-5-ans-des",
+      "name": "Data Challenge VisioMel (mélanome)",
+      "inputData": "Images de lames de mélanome numérisées (haute résolution) + variables cliniques : âge, sexe, localisation, épaisseur de Breslow, présence d'ulcération, antécédents. Patients de la base RIC-Mel, mélanome localisé (stade 0-IIC), diagnostiqués 2012-2016, ≥5 ans de suivi."
+    },
+    {
+      "slug": "sndskit-moteur-de-recherche-pour-extraire-les-donnees-de",
+      "name": "sndskit – moteur de recherche de codes",
+      "inputData": "Tables du SNDS du périmètre du projet (PMSI, DCIR, CépiDc). En entrée : un seul fichier (var_def) listant les codes à requêter — maladies (CIM-10/ICD), actes (CCAM), médicaments (ATC)."
+    },
+    {
+      "slug": "d-ia-gno-dent-data-challenge-favoriser-lacces-la-detection",
+      "name": "Data Challenge D-IA-GNO-DENT (maladies rares dentaires)",
+      "inputData": "Base de photographies de cavités buccales (visage, bouche, dents). Données non anonymisables par nature : accès sur demande auprès du CHRU de Strasbourg."
+    },
+    {
+      "slug": "allergen-chip-challenge-identification-des-allergenes-en",
+      "name": "Allergen Chip Challenge (allergènes)",
+      "inputData": "Données cliniques + profil immunologique (dosages d'anticorps IgE par puce) de 4 271 patients, données rétrospectives 2012-2023 (tabulaires). Base accessible en open data sur data.gouv.fr."
+    },
+    {
+      "slug": "data-challenge-digilut-amelioration-de-la-detection-du-rejet",
+      "name": "Data Challenge DigiLut (greffe pulmonaire)",
+      "inputData": "Environ 2 500 couples de lames de biopsies bronchiques numérisées (haute résolution), de patients transplantés pulmonaires suivis à l'hôpital Foch, en partie annotées par un panel international de pathologistes."
+    },
+    {
+      "slug": "data-challenge-cytolog-ia-automatisation-du-diagnostic-des",
+      "name": "Data Challenge Cytolog-IA (hématologie)",
+      "inputData": "Environ 75 000 images de globules blancs (leucocytes) issues de frottis sanguins numérisés à fort grossissement, annotées selon 23 classes, provenant de 23 centres hospitaliers francophones."
+    }
+  ]
+}
