@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import boasData from "./data/boas_data.json";
+import { fetchTools } from "./lib/fetchTools";
 import { ADVANCED_KEYS, DENSITY, FACET_DEFS, LANG_COUNT } from "./lib/constants";
 import { clearStoredRanks, computeResults, deriveOptions, emptyFilters, loadRanks, saveRanks, toggleFilter } from "./lib/boas";
 import Nav from "./components/Nav";
@@ -14,25 +14,12 @@ import Footer from "./components/Footer";
 import ToolModal from "./components/ToolModal";
 import RankMenu from "./components/RankMenu";
 
-const TOOLS = boasData.tools || [];
-const TOTAL = TOOLS.length || 48;
-
-const VALIDATED_COUNT = TOOLS.filter((t) => t.validation === "Validé").length;
-const DOMAINS_COUNT = new Set(
-  TOOLS.flatMap((t) => t.medicalDomains || []).filter((d) => d && d !== "Autre" && d !== "Tous")
-).size;
-
-const MARQUEE_BASE = (() => {
-  const raw = [...new Set([
-    ...TOOLS.flatMap((t) => t.medicalDomains || []),
-    ...TOOLS.flatMap((t) => t.languages || []),
-    ...TOOLS.flatMap((t) => t.objectives || []),
-  ].filter((v) => v && v !== "Autre" && v !== "Tous" && v !== "Non précisé"))];
-  return raw.length ? raw : ["Diabète", "Python", "OMOP", "Cartographie", "SAS", "Oncologie", "SNDS", "R", "Épidémiologie"];
-})();
-const MARQUEE_ITEMS = [...MARQUEE_BASE, ...MARQUEE_BASE];
+const MARQUEE_FALLBACK = ["Diabète", "Python", "OMOP", "Cartographie", "SAS", "Oncologie", "SNDS", "R", "Épidémiologie"];
 
 export default function App() {
+  const [tools, setTools] = useState([]);
+  const [status, setStatus] = useState("loading"); // "loading" | "error" | "ready"
+  const [fetchAttempt, setFetchAttempt] = useState(0); // incremente par « Réessayer »
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("rank");
   const [view, setView] = useState("grid");
@@ -45,14 +32,35 @@ export default function App() {
   const [openRankId, setOpenRankId] = useState(null);
   const [rankPos, setRankPos] = useState({ top: 90, left: 20 });
 
+  // Chargement des donnees : Supabase (JSON local si non configure).
+  // Relance quand fetchAttempt change (bouton « Réessayer »), sans recharger la page.
+  useEffect(() => {
+    let cancelled = false;
+    setStatus("loading");
+    fetchTools()
+      .then((list) => {
+        if (cancelled) return;
+        setTools(list);
+        setStatus("ready");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.warn("[BOAS] Echec du chargement du catalogue :", err && err.message);
+        setStatus("error");
+      });
+    return () => { cancelled = true; };
+  }, [fetchAttempt]);
+
   // Mot du titre en rotation toutes les 2.4s.
   useEffect(() => {
     const timer = setInterval(() => setRotIndex((i) => i + 1), 2400);
     return () => clearInterval(timer);
   }, []);
 
-  // Compteur animé des statistiques (0 -> valeur finale) au montage.
+  // Compteur animé des statistiques (0 -> valeur finale), lancé à l'arrivée des données.
+  const loaded = tools.length > 0;
   useEffect(() => {
+    if (!loaded) return;
     const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { setCountProgress(1); return; }
     const dur = 1200;
@@ -64,11 +72,27 @@ export default function App() {
       if (p >= 1) clearInterval(timer);
     }, 33);
     return () => clearInterval(timer);
-  }, []);
+  }, [loaded]);
+
+  const total = tools.length || 48;
+  const validatedCount = useMemo(() => tools.filter((t) => t.validation === "Validé").length, [tools]);
+  const domainsCount = useMemo(
+    () => new Set(tools.flatMap((t) => t.medicalDomains || []).filter((d) => d && d !== "Autre" && d !== "Tous")).size,
+    [tools]
+  );
+  const marqueeItems = useMemo(() => {
+    const raw = [...new Set([
+      ...tools.flatMap((t) => t.medicalDomains || []),
+      ...tools.flatMap((t) => t.languages || []),
+      ...tools.flatMap((t) => t.objectives || []),
+    ].filter((v) => v && v !== "Autre" && v !== "Tous" && v !== "Non précisé"))];
+    const base = raw.length ? raw : MARQUEE_FALLBACK;
+    return [...base, ...base];
+  }, [tools]);
 
   const results = useMemo(
-    () => computeResults(TOOLS, { query, filters, sort, ranks }),
-    [query, filters, sort, ranks]
+    () => computeResults(tools, { query, filters, sort, ranks }),
+    [tools, query, filters, sort, ranks]
   );
 
   const handleToggleFilter = (key, value) => setFilters((f) => toggleFilter(f, key, value));
@@ -101,14 +125,14 @@ export default function App() {
 
   const buildFacet = (def) => ({
     label: def.label,
-    chips: deriveOptions(def, TOOLS).map((opt) => ({
+    chips: deriveOptions(def, tools).map((opt) => ({
       label: opt,
       active: (filters[def.key] || []).includes(opt),
       onToggle: () => handleToggleFilter(def.key, opt),
     })),
   });
-  const primaryFacets = useMemo(() => FACET_DEFS.filter((d) => !ADVANCED_KEYS.includes(d.key)).map(buildFacet), [filters]);
-  const advancedFacets = useMemo(() => FACET_DEFS.filter((d) => ADVANCED_KEYS.includes(d.key)).map(buildFacet), [filters]);
+  const primaryFacets = useMemo(() => FACET_DEFS.filter((d) => !ADVANCED_KEYS.includes(d.key)).map(buildFacet), [filters, tools]);
+  const advancedFacets = useMemo(() => FACET_DEFS.filter((d) => ADVANCED_KEYS.includes(d.key)).map(buildFacet), [filters, tools]);
   const advancedActive = advancedFacets.reduce((n, f) => n + f.chips.filter((c) => c.active).length, 0);
 
   const activeCount = FACET_DEFS.reduce((n, d) => n + (filters[d.key]?.length || 0), 0);
@@ -116,15 +140,15 @@ export default function App() {
 
   const cnt = (target) => String(Math.round((target || 0) * countProgress));
   const heroStats = [
-    { n: cnt(TOTAL), l: "Algorithmes référencés" },
-    { n: cnt(VALIDATED_COUNT), l: "Validés et reproductibles" },
+    { n: cnt(total), l: "Algorithmes référencés" },
+    { n: cnt(validatedCount), l: "Validés et reproductibles" },
     { n: cnt(LANG_COUNT), l: "Langages couverts" },
-    { n: cnt(DOMAINS_COUNT), l: "Domaines médicaux" },
+    { n: cnt(domainsCount), l: "Domaines médicaux" },
   ];
 
   const compact = DENSITY === "Compact";
-  const showEmpty = TOTAL > 0 && results.length === 0;
-  const selectedTool = TOOLS.find((t) => t.id === selectedId) || null;
+  const showEmpty = status === "ready" && results.length === 0;
+  const selectedTool = tools.find((t) => t.id === selectedId) || null;
 
   return (
     <div style={{ minHeight: "100vh", position: "relative", overflow: "hidden" }}>
@@ -142,13 +166,13 @@ export default function App() {
           query={query}
           onQuery={(e) => setQuery(e.target.value)}
           shown={results.length}
-          total={TOTAL}
+          total={total}
           rotIndex={rotIndex}
         />
 
         <StatsStrip stats={heroStats} />
 
-        <Marquee items={MARQUEE_ITEMS} />
+        <Marquee items={marqueeItems} />
 
         <Toolbar
           query={query}
@@ -167,6 +191,29 @@ export default function App() {
         />
 
         <main style={{ padding: "28px 0 10px", minHeight: "40vh" }}>
+          {status === "loading" && (
+            <div style={{ textAlign: "center", padding: "80px 20px", color: "#667085", fontFamily: "'JetBrains Mono', monospace", fontSize: 14, animation: "boasFade .4s ease both" }}>
+              Chargement du catalogue…
+            </div>
+          )}
+
+          {status === "error" && (
+            <div style={{ maxWidth: 480, margin: "40px auto", background: "#fff", border: "1px solid #e8eaef", borderRadius: 18, padding: "36px 32px", textAlign: "center", boxShadow: "0 12px 34px rgba(15,20,36,.07)", animation: "boasPop .3s ease both" }}>
+              <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 20, fontWeight: 600, color: "#0f1424" }}>
+                Impossible de charger le catalogue.
+              </div>
+              <p style={{ color: "#667085", margin: "12px 0 0", fontSize: 14.5, lineHeight: 1.55 }}>
+                Vérifiez votre connexion puis réessayez.
+              </p>
+              <button
+                onClick={() => setFetchAttempt((n) => n + 1)}
+                style={{ marginTop: 22, fontFamily: "inherit", fontSize: 14, fontWeight: 600, color: "#fff", background: "linear-gradient(140deg, #10b981, #059669)", border: 0, padding: "11px 22px", borderRadius: 11, cursor: "pointer", boxShadow: "0 8px 20px rgba(16,185,129,.3)" }}
+              >
+                ↺ Réessayer
+              </button>
+            </div>
+          )}
+
           {showEmpty && (
             <div style={{ textAlign: "center", padding: "80px 20px", animation: "boasFade .4s ease both" }}>
               <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 24, fontWeight: 600, color: "#0f1424" }}>
@@ -176,7 +223,7 @@ export default function App() {
             </div>
           )}
 
-          {results.length > 0 && view === "grid" && (
+          {status === "ready" && results.length > 0 && view === "grid" && (
             <ResultsGrid
               results={results}
               ranks={ranks}
@@ -186,11 +233,11 @@ export default function App() {
             />
           )}
 
-          {results.length > 0 && view === "table" && (
+          {status === "ready" && results.length > 0 && view === "table" && (
             <ResultsTable results={results} onOpen={setSelectedId} />
           )}
 
-          {results.length > 0 && view === "tier" && (
+          {status === "ready" && results.length > 0 && view === "tier" && (
             <TierList
               results={results}
               ranks={ranks}
@@ -201,7 +248,7 @@ export default function App() {
           )}
         </main>
 
-        <Footer total={TOTAL} />
+        <Footer total={total} />
       </div>
 
       {selectedTool && (

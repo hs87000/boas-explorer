@@ -5,3 +5,8 @@ dist-ssr
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
+
+# Identifiants Supabase : jamais sur GitHub
+.env
+.env.*
+!.env.example
