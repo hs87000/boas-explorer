@@ -2,3 +2,6 @@ node_modules
 dist
 *.bak
 *.20*.bak
+
+# Config locale de l'outil Claude Code (inutile sur GitHub)
+.claude/

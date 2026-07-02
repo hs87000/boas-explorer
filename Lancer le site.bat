@@ -1,46 +1,34 @@
 @echo off
 REM ============================================================
-REM  Lanceur local de l'ANCIEN PROTOTYPE BOAS Explorer (legacy/)
-REM  Pour la vraie app React, voir app/ (npm run dev).
-REM  Double-clique sur ce fichier pour demarrer le prototype.
+REM  Lanceur local du site BOAS Explorer (app React dans app/)
+REM  Double-clique sur ce fichier pour demarrer le site.
 REM ============================================================
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0app"
 
-set PORT=8000
-set PAGE=legacy/BOAS%%20Explorer.dc.html
+REM --- Verifier que Node.js / npm est installe ---
+where npm >nul 2>nul
+if errorlevel 1 (
+    echo  npm introuvable.
+    echo  Installe Node.js ^(https://nodejs.org^), puis relance ce fichier.
+    echo.
+    pause
+    exit /b 1
+)
+
+REM --- Premiere utilisation : installer les dependances ---
+if not exist node_modules (
+    echo  Premiere utilisation : installation des dependances...
+    echo  ^(cela peut prendre une minute^)
+    echo.
+    call npm install
+)
 
 echo.
-echo  Demarrage du serveur local sur le port %PORT% ...
+echo  Demarrage du site sur http://localhost:5173 ...
 echo  (laisse cette fenetre ouverte tant que tu utilises le site)
 echo.
 
-REM --- Essai 1 : Python ---
-where python >nul 2>nul
-if %errorlevel%==0 (
-    start "" "http://localhost:%PORT%/%PAGE%"
-    python -m http.server %PORT%
-    goto :eof
-)
-
-REM --- Essai 2 : py launcher ---
-where py >nul 2>nul
-if %errorlevel%==0 (
-    start "" "http://localhost:%PORT%/%PAGE%"
-    py -m http.server %PORT%
-    goto :eof
-)
-
-REM --- Essai 3 : Node / npx ---
-where npx >nul 2>nul
-if %errorlevel%==0 (
-    start "" "http://localhost:%PORT%/%PAGE%"
-    npx --yes serve -l %PORT%
-    goto :eof
-)
-
-echo  AUCUN serveur trouve.
-echo  Installe Python (https://www.python.org/downloads/) en cochant
-echo  "Add Python to PATH", puis relance ce fichier.
-echo.
-pause
+REM Ouvre le navigateur apres 3 secondes, le temps que le serveur demarre
+start "" /min cmd /c "timeout /t 3 >nul && start http://localhost:5173"
+call npm run dev
