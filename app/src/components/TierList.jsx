@@ -1,9 +1,26 @@
+import { useState } from "react";
 import TierItem from "./TierItem";
-import { TIERS } from "../lib/constants";
+import { EDS_LIST, TIERS } from "../lib/constants";
 
-// Tier list publique : affiche le classement OFFICIEL etabli par l'EDS Limoges
-// (colonne tier de la base). Lecture seule — l'edition se fait dans #/admin.
-export default function TierList({ results, ranks, onOpen, votes, onVote, onTierClick }) {
+const CHIP_BASE = {
+  fontFamily: "inherit",
+  fontSize: 13,
+  fontWeight: 500,
+  padding: "6px 13px",
+  borderRadius: 999,
+  cursor: "pointer",
+  transition: "all .14s ease",
+  lineHeight: 1.2,
+};
+
+// Tier list publique : affiche le classement OFFICIEL de l'EDS selectionne
+// (Limoges / Bordeaux / Poitiers). Lecture seule — en mode admin, la bulle
+// de rang de chaque outil est cliquable pour classer dans l'EDS affiche.
+export default function TierList({ results, ranksByEds, onOpen, votes, onVote, onTierClick }) {
+  const [selectedEds, setSelectedEds] = useState("limoges");
+  const eds = EDS_LIST.find((e) => e.key === selectedEds);
+  const ranks = ranksByEds[selectedEds] || {};
+
   const unrankedItems = results.filter((t) => !ranks[t.id]);
   const allRanked = unrankedItems.length === 0;
 
@@ -12,10 +29,29 @@ export default function TierList({ results, ranks, onOpen, votes, onVote, onTier
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 600, color: "#0a8255", background: "#ecfdf5", border: "1px solid #b6ebd4", padding: "6px 13px", borderRadius: 999 }}>
           <span style={{ width: 7, height: 7, borderRadius: 999, background: "#10b981", boxShadow: "0 0 0 4px rgba(16,185,129,.18)" }} />
-          Classement officiel · EDS Limoges
+          Classement officiel · {eds.label}
         </span>
+
+        <div style={{ display: "flex", gap: 7 }} role="tablist" aria-label="Choisir l'EDS affiché">
+          {EDS_LIST.map((e) => (
+            <button
+              key={e.key}
+              role="tab"
+              aria-selected={selectedEds === e.key}
+              onClick={() => setSelectedEds(e.key)}
+              style={
+                selectedEds === e.key
+                  ? { ...CHIP_BASE, background: "#ecfdf5", border: "1px solid #b6ebd4", color: "#0a8255", fontWeight: 600 }
+                  : { ...CHIP_BASE, background: "#fff", border: "1px solid #e4e7ec", color: "#475467" }
+              }
+            >
+              {e.label}
+            </button>
+          ))}
+        </div>
+
         <span style={{ fontSize: 13.5, color: "#667085" }}>
-          Tier list établie par l'équipe de l'EDS Limoges (S = meilleur).
+          Tier list établie par l'équipe de l'{eds.label} (S = meilleur).
         </span>
       </div>
 
@@ -36,7 +72,7 @@ export default function TierList({ results, ranks, onOpen, votes, onVote, onTier
                     onOpen={() => onOpen(tool.id)}
                     vote={votes[tool.id]}
                     onVote={onVote}
-                    onTierClick={onTierClick}
+                    onTierClick={onTierClick ? (toolId, e) => onTierClick(toolId, selectedEds, e) : undefined}
                   />
                 ))}
                 {items.length === 0 && (
@@ -60,7 +96,7 @@ export default function TierList({ results, ranks, onOpen, votes, onVote, onTier
                 onOpen={() => onOpen(tool.id)}
                 vote={votes[tool.id]}
                 onVote={onVote}
-                onTierClick={onTierClick}
+                onTierClick={onTierClick ? (toolId, e) => onTierClick(toolId, selectedEds, e) : undefined}
               />
             ))}
             {allRanked && (

@@ -4,7 +4,7 @@ import { castVote, fetchVoteData, removeVote } from "./lib/votes";
 import { fetchLegends, saveLegend, LEGEND_DEFAULTS } from "./lib/content";
 import { saveTier } from "./lib/tiers";
 import { supabase } from "./lib/supabase";
-import { ADVANCED_KEYS, DENSITY, FACET_DEFS, LANG_COUNT } from "./lib/constants";
+import { ADVANCED_KEYS, DENSITY, EDS_LIST, FACET_DEFS, LANG_COUNT } from "./lib/constants";
 import { computeResults, deriveOptions, emptyFilters, toggleFilter } from "./lib/boas";
 import useSession from "./hooks/useSession";
 import Nav from "./components/Nav";
@@ -130,11 +130,14 @@ export default function App() {
     return [...base, ...base];
   }, [tools]);
 
-  // Rangs officiels (EDS Limoges) : lus depuis la colonne tier de la base.
+  // Rangs officiels par EDS (Limoges / Bordeaux / Poitiers), lus depuis la base.
   // En mode admin ils sont editables directement sur le site (badge/fiche).
-  const ranks = useMemo(() => {
+  const ranksByEds = useMemo(() => {
     const r = {};
-    tools.forEach((t) => { if (t.tier) r[t.id] = t.tier; });
+    for (const eds of EDS_LIST) {
+      r[eds.key] = {};
+      tools.forEach((t) => { if (t[eds.field]) r[eds.key][t.id] = t[eds.field]; });
+    }
     return r;
   }, [tools]);
 
@@ -146,8 +149,8 @@ export default function App() {
   }, [voteCounts]);
 
   const results = useMemo(
-    () => computeResults(tools, { query, filters, sort, ranks, voteScores }),
-    [tools, query, filters, sort, ranks, voteScores]
+    () => computeResults(tools, { query, filters, sort, ranksByEds, voteScores }),
+    [tools, query, filters, sort, ranksByEds, voteScores]
   );
 
   const handleToggleFilter = (key, value) => setFilters((f) => toggleFilter(f, key, value));
@@ -227,29 +230,31 @@ export default function App() {
 
   // --- Edition admin directement sur le site ---
 
-  const openTierMenu = (toolId, e) => {
+  const openTierMenu = (toolId, edsKey, e) => {
     e.stopPropagation();
-    if (tierMenu && tierMenu.id === toolId) { setTierMenu(null); return; }
+    if (tierMenu && tierMenu.id === toolId && tierMenu.eds === edsKey) { setTierMenu(null); return; }
     let top = 90, left = 20;
     const r = e.currentTarget && e.currentTarget.getBoundingClientRect && e.currentTarget.getBoundingClientRect();
     if (r) {
       top = Math.min(r.bottom + 8, window.innerHeight - 56);
       left = Math.max(8, Math.min(r.left, window.innerWidth - 292));
     }
-    setTierMenu({ id: toolId, top, left });
+    setTierMenu({ id: toolId, eds: edsKey, top, left });
   };
 
-  const updateTier = async (toolId, tier) => {
+  const updateTier = async (toolId, edsKey, tier) => {
     setTierMenu(null);
+    const eds = EDS_LIST.find((e) => e.key === edsKey);
+    if (!eds) return;
     const tool = tools.find((t) => t.id === toolId);
-    const prev = tool?.tier ?? null;
+    const prev = tool?.[eds.field] ?? null;
     if (tier === prev) return;
-    setTools((ts) => ts.map((t) => (t.id === toolId ? { ...t, tier } : t)));
-    const res = await saveTier(toolId, tier);
+    setTools((ts) => ts.map((t) => (t.id === toolId ? { ...t, [eds.field]: tier } : t)));
+    const res = await saveTier(toolId, edsKey, tier);
     if (res.ok) {
-      showToast("ok", tier ? `Rang ${tier} enregistré` : "Rang retiré");
+      showToast("ok", tier ? `Rang ${tier} enregistré (${eds.label})` : `Rang retiré (${eds.label})`);
     } else {
-      setTools((ts) => ts.map((t) => (t.id === toolId ? { ...t, tier: prev } : t)));
+      setTools((ts) => ts.map((t) => (t.id === toolId ? { ...t, [eds.field]: prev } : t)));
       showToast("err", "Rang non enregistré (session expirée ?)");
     }
   };
@@ -361,7 +366,6 @@ export default function App() {
           {status === "ready" && results.length > 0 && view === "grid" && (
             <ResultsGrid
               results={results}
-              ranks={ranks}
               votes={votes}
               onVote={handleVote}
               onTierClick={admin ? openTierMenu : undefined}
@@ -377,7 +381,7 @@ export default function App() {
           {status === "ready" && results.length > 0 && view === "tier" && (
             <TierList
               results={results}
-              ranks={ranks}
+              ranksByEds={ranksByEds}
               onOpen={setSelectedId}
               votes={votes}
               onVote={handleVote}
@@ -392,7 +396,6 @@ export default function App() {
       {selectedTool && (
         <ToolModal
           tool={selectedTool}
-          rank={ranks[selectedTool.id] || null}
           onClose={() => setSelectedId(null)}
           vote={votes[selectedTool.id]}
           onVote={handleVote}
@@ -403,9 +406,9 @@ export default function App() {
 
       {tierMenu && menuTool && (
         <TierMenu
-          currentTier={menuTool.tier ?? null}
+          currentTier={menuTool[EDS_LIST.find((e) => e.key === tierMenu.eds)?.field] ?? null}
           pos={{ top: tierMenu.top, left: tierMenu.left }}
-          onPick={(tier) => updateTier(tierMenu.id, tier)}
+          onPick={(tier) => updateTier(tierMenu.id, tierMenu.eds, tier)}
           onClose={() => setTierMenu(null)}
         />
       )}

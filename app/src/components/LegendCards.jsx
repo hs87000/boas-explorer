@@ -1,5 +1,5 @@
 import { useState } from "react";
-import EdsTierBadge from "./EdsTierBadge";
+import { EdsSampleBadge } from "./EdsTierBadge";
 
 const CARD = {
   background: "rgba(255,255,255,.7)",
@@ -103,10 +103,26 @@ export default function LegendCards({ legends, admin, onSave }) {
         onSave={onSave}
       />
       <LegendCard
-        sample={<EdsTierBadge tier="S" />}
+        sample={<EdsSampleBadge letter="L" tier="S" />}
         title="Classement EDS Limoges"
         contentKey="legend_eds"
         body={legends.legend_eds}
+        admin={admin}
+        onSave={onSave}
+      />
+      <LegendCard
+        sample={<EdsSampleBadge letter="B" tier="A" />}
+        title="Classement EDS Bordeaux"
+        contentKey="legend_eds_bordeaux"
+        body={legends.legend_eds_bordeaux}
+        admin={admin}
+        onSave={onSave}
+      />
+      <LegendCard
+        sample={<EdsSampleBadge letter="P" tier="B" />}
+        title="Classement EDS Poitiers"
+        contentKey="legend_eds_poitiers"
+        body={legends.legend_eds_poitiers}
         admin={admin}
         onSave={onSave}
       />

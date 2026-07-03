@@ -27,6 +27,8 @@ export const SELECT = [
   "exclusion",
   "inputData:input_data",
   "tier",
+  "tierBordeaux:tier_bordeaux",
+  "tierPoitiers:tier_poitiers",
 ].join(", ");
 
 // Charge les outils depuis Supabase.

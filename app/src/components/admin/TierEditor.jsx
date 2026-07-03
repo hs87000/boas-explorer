@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { SELECT } from "../../lib/fetchTools";
-import { TIERS } from "../../lib/constants";
+import { EDS_LIST, TIERS } from "../../lib/constants";
+import { saveTier } from "../../lib/tiers";
 import { statusColor } from "../../lib/boas";
 
 const TIER_COLOR = Object.fromEntries(TIERS.map((t) => [t.key, t.color]));
 
-// Editeur de la tier list OFFICIELLE : chaque changement de menu deroulant
-// fait un UPDATE dans la table tools de Supabase (colonne tier).
+// Editeur en masse des tier lists OFFICIELLES (Limoges, Bordeaux, Poitiers) :
+// un menu deroulant par outil et par EDS, chaque changement fait un UPDATE
+// dans la table tools. L'edition est aussi possible directement sur le site.
 export default function TierEditor() {
   const [tools, setTools] = useState([]);
   const [status, setStatus] = useState("loading"); // "loading" | "error" | "ready"
   const [fetchAttempt, setFetchAttempt] = useState(0);
-  const [rows, setRows] = useState({}); // etat d'enregistrement par outil : { [id]: { state, message } }
+  const [cells, setCells] = useState({}); // etat par "toolId:edsKey" : { state, message }
   const timersRef = useRef({});
 
   // Chargement direct depuis Supabase (pas de repli JSON ici : on edite la
@@ -31,30 +33,27 @@ export default function TierEditor() {
 
   useEffect(() => () => Object.values(timersRef.current).forEach(clearTimeout), []);
 
-  const setRow = (id, value) => setRows((r) => ({ ...r, [id]: value }));
+  const setCell = (key, value) => setCells((c) => ({ ...c, [key]: value }));
 
-  const changeTier = async (tool, rawValue) => {
+  const changeTier = async (tool, eds, rawValue) => {
     const tier = rawValue || null;
-    const prev = tool.tier ?? null;
+    const prev = tool[eds.field] ?? null;
     if (tier === prev) return;
+    const key = `${tool.id}:${eds.key}`;
 
-    clearTimeout(timersRef.current[tool.id]);
-    setRow(tool.id, { state: "saving" });
-    setTools((ts) => ts.map((t) => (t.id === tool.id ? { ...t, tier } : t)));
+    clearTimeout(timersRef.current[key]);
+    setCell(key, { state: "saving" });
+    setTools((ts) => ts.map((t) => (t.id === tool.id ? { ...t, [eds.field]: tier } : t)));
 
-    // .select() apres l'update : si la ligne revient, l'ecriture a vraiment eu
-    // lieu ; si rien ne revient, le RLS l'a refusee en silence (session expiree ?).
-    const { data, error } = await supabase.from("tools").update({ tier }).eq("id", tool.id).select("id");
-
-    if (error || !data || data.length === 0) {
-      if (error) console.warn("[BOAS admin] UPDATE refuse :", error.message);
-      setTools((ts) => ts.map((t) => (t.id === tool.id ? { ...t, tier: prev } : t)));
-      setRow(tool.id, { state: "error", message: "Échec de l'enregistrement. Réessayez (session expirée ?)." });
+    const res = await saveTier(tool.id, eds.key, tier);
+    if (!res.ok) {
+      setTools((ts) => ts.map((t) => (t.id === tool.id ? { ...t, [eds.field]: prev } : t)));
+      setCell(key, { state: "error" });
+      timersRef.current[key] = setTimeout(() => setCell(key, undefined), 3000);
       return;
     }
-
-    setRow(tool.id, { state: "saved" });
-    timersRef.current[tool.id] = setTimeout(() => setRow(tool.id, undefined), 2000);
+    setCell(key, { state: "saved" });
+    timersRef.current[key] = setTimeout(() => setCell(key, undefined), 2000);
   };
 
   if (status === "loading") {
@@ -84,56 +83,62 @@ export default function TierEditor() {
     );
   }
 
-  const ranked = tools.filter((t) => t.tier).length;
+  const rankedCount = (eds) => tools.filter((t) => t[eds.field]).length;
 
   return (
     <div style={{ paddingBottom: 60 }}>
-      <p style={{ color: "#667085", fontSize: 13.5, lineHeight: 1.55, maxWidth: "70ch", margin: "0 0 20px" }}>
-        Le rang choisi ici est enregistré dans la base et devient le classement officiel.
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "#98a2b3", marginLeft: 10 }}>
-          {ranked} / {tools.length} classés
-        </span>
+      <p style={{ color: "#667085", fontSize: 13.5, lineHeight: 1.55, maxWidth: "80ch", margin: "0 0 8px" }}>
+        Les rangs choisis ici sont enregistrés dans la base et deviennent les classements officiels.
+      </p>
+      <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "#98a2b3", margin: "0 0 20px" }}>
+        {EDS_LIST.map((eds) => `${eds.label} : ${rankedCount(eds)}/${tools.length}`).join(" · ")}
       </p>
 
       <div style={{ background: "#fff", border: "1px solid #e8eaef", borderRadius: 18, overflow: "hidden" }}>
-        {tools.map((tool) => {
-          const row = rows[tool.id];
-          return (
-            <div key={tool.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 18px", borderBottom: "1px solid #f1f2f5" }}>
-              <span
-                aria-hidden="true"
-                style={{ width: 22, height: 22, borderRadius: 6, flex: "none", background: tool.tier ? TIER_COLOR[tool.tier] : "#f1f3f6", border: tool.tier ? "1px solid rgba(15,20,36,.14)" : "1px dashed #cbd2dc", display: "inline-flex", alignItems: "center", justifyContent: "center", fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 11, color: tool.tier ? "#0f1424" : "#aab2bf" }}
-              >
-                {tool.tier || "–"}
-              </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 18px", borderBottom: "1px solid #eceef2", background: "#fafbfc", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, textTransform: "uppercase", letterSpacing: ".05em", color: "#98a2b3" }}>
+          <span style={{ flex: 1 }}>Algorithme</span>
+          {EDS_LIST.map((eds) => (
+            <span key={eds.key} style={{ width: 96, textAlign: "center", flex: "none" }}>{eds.label.replace("EDS ", "")}</span>
+          ))}
+        </div>
 
-              <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: "#0f1424", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        {tools.map((tool) => (
+          <div key={tool.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "9px 18px", borderBottom: "1px solid #f1f2f5" }}>
+            <span style={{ flex: 1, minWidth: 0, display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <span title={tool.validation} style={{ width: 8, height: 8, borderRadius: 999, flex: "none", background: statusColor(tool.validation) }} />
+              <span style={{ fontSize: 14, fontWeight: 600, color: "#0f1424", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {tool.name}
               </span>
+            </span>
 
-              <span title={tool.validation} style={{ width: 8, height: 8, borderRadius: 999, flex: "none", background: statusColor(tool.validation) }} />
-
-              <span aria-live="polite" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, flex: "none", minWidth: 150, textAlign: "right", color: row?.state === "error" ? "#b91c1c" : row?.state === "saved" ? "#0a8255" : "#98a2b3" }}>
-                {row?.state === "saving" && "Enregistrement…"}
-                {row?.state === "saved" && "✓ Enregistré"}
-                {row?.state === "error" && row.message}
-              </span>
-
-              <select
-                value={tool.tier ?? ""}
-                onChange={(e) => changeTier(tool, e.target.value)}
-                disabled={row?.state === "saving"}
-                aria-label={`Rang de ${tool.name}`}
-                style={{ height: 34, border: "1px solid #e1e4ea", borderRadius: 9, background: "#fff", padding: "0 8px", fontSize: 13, color: "#344054", fontFamily: "inherit", cursor: "pointer", outline: 0, flex: "none" }}
-              >
-                <option value="">— Non classé</option>
-                {TIERS.map((t) => (
-                  <option key={t.key} value={t.key}>{t.key}</option>
-                ))}
-              </select>
-            </div>
-          );
-        })}
+            {EDS_LIST.map((eds) => {
+              const key = `${tool.id}:${eds.key}`;
+              const cell = cells[key];
+              const tier = tool[eds.field] ?? null;
+              return (
+                <span key={eds.key} style={{ width: 96, flex: "none", display: "inline-flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
+                  <span
+                    aria-hidden="true"
+                    title={cell?.state === "error" ? "Échec de l'enregistrement" : undefined}
+                    style={{ width: 10, height: 10, borderRadius: 3, flex: "none", background: cell?.state === "error" ? "#ef4444" : cell?.state === "saved" ? "#10b981" : tier ? TIER_COLOR[tier] : "#e8eaef", opacity: cell?.state === "saving" ? 0.4 : 1 }}
+                  />
+                  <select
+                    value={tier ?? ""}
+                    onChange={(e) => changeTier(tool, eds, e.target.value)}
+                    disabled={cell?.state === "saving"}
+                    aria-label={`Rang ${eds.label} de ${tool.name}`}
+                    style={{ height: 30, width: 62, border: `1px solid ${cell?.state === "error" ? "#fecaca" : "#e1e4ea"}`, borderRadius: 8, background: "#fff", padding: "0 4px", fontSize: 13, color: "#344054", fontFamily: "inherit", cursor: "pointer", outline: 0 }}
+                  >
+                    <option value="">—</option>
+                    {TIERS.map((t) => (
+                      <option key={t.key} value={t.key}>{t.key}</option>
+                    ))}
+                  </select>
+                </span>
+              );
+            })}
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -1,12 +1,12 @@
 import Hoverable from "./Hoverable";
 import { badgeStyle, rankBubbleStyle } from "../lib/styles";
-import { ACCENT } from "../lib/constants";
+import { ACCENT, EDS_LIST } from "../lib/constants";
 import VoteWidget from "./VoteWidget";
 import TierPicker from "./TierPicker";
 
 const filled = (v) => v != null && String(v).trim() !== "";
 
-export default function ToolModal({ tool, rank, onClose, vote, onVote, admin = false, onPickTier }) {
+export default function ToolModal({ tool, onClose, vote, onVote, admin = false, onPickTier }) {
   const mainFields = [
     { k: "Objectif", v: tool.summary },
     { k: "Données de fonctionnement", v: tool.dataDescription },
@@ -80,19 +80,29 @@ export default function ToolModal({ tool, rank, onClose, vote, onVote, admin = f
             error={vote?.error ?? false}
             onVote={(value) => onVote(tool.id, value)}
           />
-          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, textTransform: "uppercase", letterSpacing: ".06em", color: "#98a2b3" }}>
-            Rang · EDS Limoges
-          </span>
-          {admin ? (
-            <TierPicker currentTier={rank} onPick={(tier) => onPickTier(tool.id, tier)} />
-          ) : (
-            <>
-              <span style={{ ...rankBubbleStyle(rank, 30), cursor: "default" }}>{rank || "–"}</span>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#b0b7c2" }}>
-                {rank ? `Classé ${rank}` : "Non classé"}
-              </span>
-            </>
-          )}
+        </div>
+
+        <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+          {EDS_LIST.map((eds) => {
+            const tier = tool[eds.field] ?? null;
+            return (
+              <div key={eds.key} style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px 12px" }}>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, textTransform: "uppercase", letterSpacing: ".06em", color: "#98a2b3", minWidth: 130 }}>
+                  Rang · {eds.label}
+                </span>
+                {admin ? (
+                  <TierPicker currentTier={tier} onPick={(t) => onPickTier(tool.id, eds.key, t)} />
+                ) : (
+                  <>
+                    <span style={{ ...rankBubbleStyle(tier, 26), cursor: "default" }}>{tier || "–"}</span>
+                    <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#b0b7c2" }}>
+                      {tier ? `Classé ${tier}` : "Non classé"}
+                    </span>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <div style={{ marginTop: 22, display: "flex", flexDirection: "column", gap: 16 }}>
