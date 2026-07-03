@@ -78,15 +78,3 @@ export function computeResults(tools, { query, filters, sort, ranks }) {
   });
   return list;
 }
-
-export function loadRanks() {
-  try { return JSON.parse(localStorage.getItem("boas-ranks")) || {}; } catch (e) { return {}; }
-}
-
-export function saveRanks(ranks) {
-  try { localStorage.setItem("boas-ranks", JSON.stringify(ranks)); } catch (e) { /* ignore */ }
-}
-
-export function clearStoredRanks() {
-  try { localStorage.removeItem("boas-ranks"); } catch (e) { /* ignore */ }
-}

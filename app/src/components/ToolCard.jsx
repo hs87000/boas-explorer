@@ -3,7 +3,7 @@ import useHover from "../hooks/useHover";
 import { badgeStyle, cardBaseStyle, glowColor, rankBubbleStyle } from "../lib/styles";
 import { ACCENT } from "../lib/constants";
 
-export default function ToolCard({ tool, rank, index, onOpen, onRankClick }) {
+export default function ToolCard({ tool, rank, index, onOpen }) {
   const [hovered, hoverHandlers] = useHover();
   const glowRef = useRef(null);
 
@@ -37,14 +37,12 @@ export default function ToolCard({ tool, rank, index, onOpen, onRankClick }) {
 
       <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={onRankClick}
-            aria-label="Attribuer un rang"
-            title="Attribuer un rang"
-            style={rankBubbleStyle(rank, 28)}
+          <span
+            title={rank ? `Rang EDS Limoges : ${rank}` : "Non classé par l'EDS Limoges"}
+            style={{ ...rankBubbleStyle(rank, 28), cursor: "default" }}
           >
-            {rank || "+"}
-          </button>
+            {rank || "–"}
+          </span>
           <span style={badgeStyle(tool.validation, ACCENT)}>{tool.validation}</span>
         </div>
         <span style={{ fontSize: 11.5, color: "#98a2b3", fontWeight: 500, textAlign: "right" }}>{tool.authorType}</span>

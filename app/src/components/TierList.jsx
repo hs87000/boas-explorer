@@ -1,32 +1,22 @@
-import Hoverable from "./Hoverable";
 import TierItem from "./TierItem";
 import { TIERS } from "../lib/constants";
 
-export default function TierList({ results, ranks, onOpen, onRankClick, onClearRanks }) {
-  const hasRanked = Object.keys(ranks).length > 0;
+// Tier list publique : affiche le classement OFFICIEL etabli par l'EDS Limoges
+// (colonne tier de la base). Lecture seule — l'edition se fait dans #/admin.
+export default function TierList({ results, ranks, onOpen }) {
   const unrankedItems = results.filter((t) => !ranks[t.id]);
   const allRanked = unrankedItems.length === 0;
 
   return (
     <div style={{ animation: "boasFade .35s ease both" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
-        <span style={{ fontSize: 13.5, color: "#667085" }}>
-          Cliquez sur la bulle{" "}
-          <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 19, height: 19, borderRadius: 5, background: "#f43f5e", color: "#0f1424", fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 11, verticalAlign: -4 }}>
-            S
-          </span>{" "}
-          d'un algorithme pour lui donner un rang. Les meilleurs remontent.
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 600, color: "#0a8255", background: "#ecfdf5", border: "1px solid #b6ebd4", padding: "6px 13px", borderRadius: 999 }}>
+          <span style={{ width: 7, height: 7, borderRadius: 999, background: "#10b981", boxShadow: "0 0 0 4px rgba(16,185,129,.18)" }} />
+          Classement officiel · EDS Limoges
         </span>
-        {hasRanked && (
-          <Hoverable
-            as="button"
-            onClick={onClearRanks}
-            style={{ height: 36, borderWidth: 1, borderStyle: "solid", borderColor: "#e1e4ea", borderRadius: 10, background: "#fff", padding: "0 14px", fontSize: 13, color: "#475467", fontFamily: "inherit", cursor: "pointer", fontWeight: 500 }}
-            hoverStyle={{ borderColor: "#d0d5dd", color: "#0f1424" }}
-          >
-            ↺ Vider les rangs
-          </Hoverable>
-        )}
+        <span style={{ fontSize: 13.5, color: "#667085" }}>
+          Tier list établie par l'équipe de l'EDS Limoges (S = meilleur).
+        </span>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -44,7 +34,6 @@ export default function TierList({ results, ranks, onOpen, onRankClick, onClearR
                     tool={tool}
                     rank={ranks[tool.id]}
                     onOpen={() => onOpen(tool.id)}
-                    onRankClick={(e) => onRankClick(tool.id, e)}
                   />
                 ))}
                 {items.length === 0 && (
@@ -66,8 +55,6 @@ export default function TierList({ results, ranks, onOpen, onRankClick, onClearR
                 tool={tool}
                 rank={ranks[tool.id]}
                 onOpen={() => onOpen(tool.id)}
-                onRankClick={(e) => onRankClick(tool.id, e)}
-                rankAriaLabel="Donner un rang"
               />
             ))}
             {allRanked && (

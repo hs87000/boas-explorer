@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchTools } from "./lib/fetchTools";
 import { ADVANCED_KEYS, DENSITY, FACET_DEFS, LANG_COUNT } from "./lib/constants";
-import { clearStoredRanks, computeResults, deriveOptions, emptyFilters, loadRanks, saveRanks, toggleFilter } from "./lib/boas";
+import { computeResults, deriveOptions, emptyFilters, toggleFilter } from "./lib/boas";
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
 import StatsStrip from "./components/StatsStrip";
@@ -12,7 +12,6 @@ import ResultsTable from "./components/ResultsTable";
 import TierList from "./components/TierList";
 import Footer from "./components/Footer";
 import ToolModal from "./components/ToolModal";
-import RankMenu from "./components/RankMenu";
 
 const MARQUEE_FALLBACK = ["Diabète", "Python", "OMOP", "Cartographie", "SAS", "Oncologie", "SNDS", "R", "Épidémiologie"];
 
@@ -28,9 +27,6 @@ export default function App() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [rotIndex, setRotIndex] = useState(0);
   const [countProgress, setCountProgress] = useState(0);
-  const [ranks, setRanks] = useState(() => loadRanks());
-  const [openRankId, setOpenRankId] = useState(null);
-  const [rankPos, setRankPos] = useState({ top: 90, left: 20 });
 
   // Chargement des donnees : Supabase (JSON local si non configure).
   // Relance quand fetchAttempt change (bouton « Réessayer »), sans recharger la page.
@@ -90,6 +86,14 @@ export default function App() {
     return [...base, ...base];
   }, [tools]);
 
+  // Rangs officiels (EDS Limoges) : lus depuis la colonne tier de la base,
+  // modifiables uniquement depuis la page d'administration.
+  const ranks = useMemo(() => {
+    const r = {};
+    tools.forEach((t) => { if (t.tier) r[t.id] = t.tier; });
+    return r;
+  }, [tools]);
+
   const results = useMemo(
     () => computeResults(tools, { query, filters, sort, ranks }),
     [tools, query, filters, sort, ranks]
@@ -97,31 +101,6 @@ export default function App() {
 
   const handleToggleFilter = (key, value) => setFilters((f) => toggleFilter(f, key, value));
   const handleReset = () => { setQuery(""); setSort("rank"); setFilters(emptyFilters()); };
-
-  const handleSetRank = (id, tier) => {
-    setRanks((prev) => {
-      const next = { ...prev };
-      if (!tier || prev[id] === tier) delete next[id];
-      else next[id] = tier;
-      saveRanks(next);
-      return next;
-    });
-    setOpenRankId(null);
-  };
-  const handleClearRanks = () => { clearStoredRanks(); setRanks({}); setOpenRankId(null); };
-
-  const handleOpenRankMenu = (id, e) => {
-    e.stopPropagation();
-    if (openRankId === id) { setOpenRankId(null); return; }
-    let top = 90, left = 20;
-    const r = e.currentTarget && e.currentTarget.getBoundingClientRect && e.currentTarget.getBoundingClientRect();
-    if (r) {
-      top = Math.min(r.bottom + 8, window.innerHeight - 56);
-      left = Math.max(8, Math.min(r.left, window.innerWidth - 252));
-    }
-    setOpenRankId(id);
-    setRankPos({ top, left });
-  };
 
   const buildFacet = (def) => ({
     label: def.label,
@@ -229,7 +208,6 @@ export default function App() {
               ranks={ranks}
               compact={compact}
               onOpen={setSelectedId}
-              onRankClick={handleOpenRankMenu}
             />
           )}
 
@@ -242,8 +220,6 @@ export default function App() {
               results={results}
               ranks={ranks}
               onOpen={setSelectedId}
-              onRankClick={handleOpenRankMenu}
-              onClearRanks={handleClearRanks}
             />
           )}
         </main>
@@ -256,17 +232,6 @@ export default function App() {
           tool={selectedTool}
           rank={ranks[selectedTool.id] || null}
           onClose={() => setSelectedId(null)}
-          onPickRank={(tier) => handleSetRank(selectedTool.id, tier)}
-        />
-      )}
-
-      {openRankId != null && (
-        <RankMenu
-          openId={openRankId}
-          ranks={ranks}
-          pos={rankPos}
-          onPick={(tier) => handleSetRank(openRankId, tier)}
-          onClose={() => setOpenRankId(null)}
         />
       )}
     </div>

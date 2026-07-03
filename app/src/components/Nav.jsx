@@ -35,6 +35,14 @@ export default function Nav() {
         >
           GitLab&nbsp;↗
         </Hoverable>
+        <Hoverable
+          as="a"
+          href="#/admin"
+          style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13.5, fontWeight: 600, color: "#0f1424", textDecoration: "none", padding: "8px 14px", borderWidth: 1, borderStyle: "solid", borderColor: "#d9dde3", borderRadius: 9, background: "#fff" }}
+          hoverStyle={{ borderColor: "#10b981", boxShadow: "0 0 0 3px rgba(16,185,129,.12)" }}
+        >
+          Admin
+        </Hoverable>
       </div>
     </nav>
   );

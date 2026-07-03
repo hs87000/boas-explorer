@@ -1,16 +1,10 @@
 import Hoverable from "./Hoverable";
-import { badgeStyle } from "../lib/styles";
-import { ACCENT, TIERS } from "../lib/constants";
+import { badgeStyle, rankBubbleStyle } from "../lib/styles";
+import { ACCENT } from "../lib/constants";
 
 const filled = (v) => v != null && String(v).trim() !== "";
 
-const RANK_BTN_BASE = {
-  display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34,
-  borderRadius: 9, cursor: "pointer", fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 15,
-  flex: "none", padding: 0, lineHeight: 1, transition: "transform .14s ease, opacity .14s ease",
-};
-
-export default function ToolModal({ tool, rank, onClose, onPickRank }) {
+export default function ToolModal({ tool, rank, onClose }) {
   const mainFields = [
     { k: "Objectif", v: tool.summary },
     { k: "Données de fonctionnement", v: tool.dataDescription },
@@ -37,28 +31,6 @@ export default function ToolModal({ tool, rank, onClose, onPickRank }) {
   const hasHowItWorks = filled(tool.howItWorks);
   const hasEnrich = enrichFields.length > 0;
   const hasRepo = !!tool.repoUrl;
-  const rankHint = rank ? `Classé ${rank}` : "Non classé";
-
-  const rankButtons = TIERS.map((tier) => ({
-    key: tier.key,
-    label: tier.key,
-    onPick: () => onPickRank(tier.key),
-    style: {
-      ...RANK_BTN_BASE,
-      border: 0,
-      background: tier.color,
-      color: "#0f1424",
-      ...(rank === tier.key ? { outline: "2px solid #0f1424", outlineOffset: 2 } : rank ? { opacity: 0.45 } : {}),
-    },
-  }));
-  if (rank) {
-    rankButtons.push({
-      key: "clear",
-      label: "✕",
-      onPick: () => onPickRank(null),
-      style: { ...RANK_BTN_BASE, border: "1px solid #e4e7ec", background: "#fff", color: "#98a2b3", fontSize: 14, fontWeight: 500 },
-    });
-  }
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) onClose();
@@ -95,16 +67,12 @@ export default function ToolModal({ tool, rank, onClose, onPickRank }) {
 
         <div style={{ marginTop: 18, display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px 12px" }}>
           <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, textTransform: "uppercase", letterSpacing: ".06em", color: "#98a2b3" }}>
-            Votre rang
+            Rang · EDS Limoges
           </span>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-            {rankButtons.map((rb) => (
-              <Hoverable key={rb.key} as="button" onClick={rb.onPick} aria-label="Classer cet algorithme" style={rb.style} hoverStyle={{ transform: "translateY(-2px)" }}>
-                {rb.label}
-              </Hoverable>
-            ))}
-          </div>
-          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#b0b7c2" }}>{rankHint}</span>
+          <span style={{ ...rankBubbleStyle(rank, 30), cursor: "default" }}>{rank || "–"}</span>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#b0b7c2" }}>
+            {rank ? `Classé ${rank}` : "Non classé"}
+          </span>
         </div>
 
         <div style={{ marginTop: 22, display: "flex", flexDirection: "column", gap: 16 }}>

@@ -1,6 +1,6 @@
 import ToolCard from "./ToolCard";
 
-export default function ResultsGrid({ results, ranks, compact, onOpen, onRankClick }) {
+export default function ResultsGrid({ results, ranks, compact, onOpen }) {
   const gridCols = compact ? "minmax(260px, 1fr)" : "minmax(312px, 1fr)";
   return (
     <section style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, ${gridCols})`, gap: 16 }} aria-label="Catalogue">
@@ -11,7 +11,6 @@ export default function ResultsGrid({ results, ranks, compact, onOpen, onRankCli
           rank={ranks[tool.id]}
           index={i}
           onOpen={() => onOpen(tool.id)}
-          onRankClick={(e) => onRankClick(tool.id, e)}
         />
       ))}
     </section>

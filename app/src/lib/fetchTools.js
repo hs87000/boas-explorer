@@ -4,7 +4,7 @@ import fallbackData from "../data/boas_data.json";
 // Alias PostgREST "nomJs:colonne_sql" : les objets renvoyes par Supabase ont
 // exactement la meme forme que ceux de boas_data.json, le reste de l'app ne
 // voit aucune difference.
-const SELECT = [
+export const SELECT = [
   "id",
   "name",
   "ficheUrl:fiche_url",
