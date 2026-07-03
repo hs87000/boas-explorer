@@ -1,10 +1,11 @@
 import Hoverable from "./Hoverable";
 import { badgeStyle } from "../lib/styles";
 import { ACCENT } from "../lib/constants";
+import VoteWidget from "./VoteWidget";
 
-const GRID_COLS = "2.4fr 1fr 1.1fr 1.3fr 0.9fr";
+const GRID_COLS = "2.2fr 1fr 1fr 1.2fr 0.8fr 1fr";
 
-export default function ResultsTable({ results, onOpen }) {
+export default function ResultsTable({ results, onOpen, votes, onVote }) {
   return (
     <div className="boas-scroll" style={{ background: "#fff", border: "1px solid #e8eaef", borderRadius: 18, overflow: "hidden", animation: "boasFade .35s ease both" }}>
       <div style={{ display: "grid", gridTemplateColumns: GRID_COLS, gap: 0, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, textTransform: "uppercase", letterSpacing: ".05em", color: "#98a2b3", background: "#fafbfc", borderBottom: "1px solid #eceef2", padding: "0 4px" }}>
@@ -13,6 +14,7 @@ export default function ResultsTable({ results, onOpen }) {
         <div style={{ padding: "13px 12px" }}>Langages</div>
         <div style={{ padding: "13px 12px" }}>Domaine</div>
         <div style={{ padding: "13px 12px" }}>MàJ</div>
+        <div style={{ padding: "13px 12px" }}>Votes</div>
       </div>
 
       {results.map((tool) => (
@@ -37,6 +39,17 @@ export default function ResultsTable({ results, onOpen }) {
           </div>
           <div style={{ padding: "14px 12px", fontSize: 12.5, color: "#98a2b3", fontFamily: "'JetBrains Mono', monospace" }}>
             {tool.lastUpdate || "—"}
+          </div>
+          <div style={{ padding: "10px 12px" }}>
+            <VoteWidget
+              toolName={tool.name}
+              up={votes[tool.id]?.up ?? 0}
+              down={votes[tool.id]?.down ?? 0}
+              myVote={votes[tool.id]?.mine ?? null}
+              saving={votes[tool.id]?.saving ?? false}
+              error={votes[tool.id]?.error ?? false}
+              onVote={(value) => onVote(tool.id, value)}
+            />
           </div>
         </Hoverable>
       ))}

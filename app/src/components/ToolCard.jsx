@@ -1,9 +1,11 @@
 import { useRef } from "react";
 import useHover from "../hooks/useHover";
-import { badgeStyle, cardBaseStyle, glowColor, rankBubbleStyle } from "../lib/styles";
+import { badgeStyle, cardBaseStyle, glowColor } from "../lib/styles";
 import { ACCENT } from "../lib/constants";
+import VoteWidget from "./VoteWidget";
+import EdsTierBadge from "./EdsTierBadge";
 
-export default function ToolCard({ tool, rank, index, onOpen }) {
+export default function ToolCard({ tool, rank, index, onOpen, vote, onVote, onTierClick }) {
   const [hovered, hoverHandlers] = useHover();
   const glowRef = useRef(null);
 
@@ -35,17 +37,20 @@ export default function ToolCard({ tool, rank, index, onOpen }) {
     >
       <div ref={glowRef} style={{ position: "absolute", inset: 0, borderRadius: 18, opacity: 0, transition: "opacity .25s ease", pointerEvents: "none", zIndex: 0 }} />
 
-      <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+      <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span
-            title={rank ? `Rang EDS Limoges : ${rank}` : "Non classé par l'EDS Limoges"}
-            style={{ ...rankBubbleStyle(rank, 28), cursor: "default" }}
-          >
-            {rank || "–"}
-          </span>
-          <span style={badgeStyle(tool.validation, ACCENT)}>{tool.validation}</span>
+          <VoteWidget
+            toolName={tool.name}
+            up={vote?.up ?? 0}
+            down={vote?.down ?? 0}
+            myVote={vote?.mine ?? null}
+            saving={vote?.saving ?? false}
+            error={vote?.error ?? false}
+            onVote={(value) => onVote(tool.id, value)}
+          />
+          <EdsTierBadge tier={rank} onClick={onTierClick ? (e) => onTierClick(tool.id, e) : undefined} />
         </div>
-        <span style={{ fontSize: 11.5, color: "#98a2b3", fontWeight: 500, textAlign: "right" }}>{tool.authorType}</span>
+        <span style={badgeStyle(tool.validation, ACCENT)}>{tool.validation}</span>
       </div>
 
       <h3 style={{ position: "relative", zIndex: 1, fontFamily: "'Space Grotesk', sans-serif", fontSize: 18, fontWeight: 600, lineHeight: 1.22, letterSpacing: "-.015em", margin: "14px 0 0", color: "#0f1424", textWrap: "balance" }}>
@@ -68,6 +73,9 @@ export default function ToolCard({ tool, rank, index, onOpen }) {
         </span>
         <span style={{ fontSize: 11.5, color: "#667085", background: "#f5f6f8", borderRadius: 6, padding: "3px 9px" }}>
           {(tool.dataTypes && tool.dataTypes[0]) || "—"}
+        </span>
+        <span style={{ fontSize: 11.5, color: "#98a2b3", background: "#f5f6f8", borderRadius: 6, padding: "3px 9px" }}>
+          {tool.authorType}
         </span>
       </div>
     </article>

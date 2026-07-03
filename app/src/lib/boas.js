@@ -57,7 +57,7 @@ export function statusColor(v) {
   return "#cbd5e1";
 }
 
-export function computeResults(tools, { query, filters, sort, ranks }) {
+export function computeResults(tools, { query, filters, sort, ranks, voteScores = {} }) {
   const q = norm(query.trim());
   let list = tools.filter((t) => {
     if (q && !(norm(t.name).includes(q) || norm(t.summary).includes(q) || norm(t.howItWorks).includes(q) || norm(t.inputData).includes(q))) return false;
@@ -72,6 +72,7 @@ export function computeResults(tools, { query, filters, sort, ranks }) {
   const byName = (a, b) => a.name.localeCompare(b.name, "fr");
   list = [...list].sort((a, b) => {
     if (sort === "rank") return (tierOrder(ranks, a.id) - tierOrder(ranks, b.id)) || byName(a, b);
+    if (sort === "votes") return ((voteScores[b.id] ?? 0) - (voteScores[a.id] ?? 0)) || byName(a, b);
     if (sort === "val") return (VAL_ORDER[a.validation] - VAL_ORDER[b.validation]) || byName(a, b);
     if (sort === "update") return (parseDate(b.lastUpdate) - parseDate(a.lastUpdate)) || byName(a, b);
     return byName(a, b);

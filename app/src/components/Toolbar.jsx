@@ -52,6 +52,7 @@ export default function Toolbar({
           style={{ height: 42, border: "1px solid #e1e4ea", borderRadius: 11, background: "#fff", padding: "0 12px", fontSize: 14, color: "#344054", fontFamily: "inherit", cursor: "pointer", outline: 0 }}
         >
           <option value="rank">Trier : par rang (S → F)</option>
+          <option value="votes">Trier : votes du public</option>
           <option value="name">Trier : A → Z</option>
           <option value="val">Trier : statut (validé d'abord)</option>
           <option value="update">Trier : dernière mise à jour</option>

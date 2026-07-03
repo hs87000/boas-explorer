@@ -1,17 +1,25 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchTools } from "./lib/fetchTools";
+import { castVote, fetchVoteData, removeVote } from "./lib/votes";
+import { fetchLegends, saveLegend, LEGEND_DEFAULTS } from "./lib/content";
+import { saveTier } from "./lib/tiers";
+import { supabase } from "./lib/supabase";
 import { ADVANCED_KEYS, DENSITY, FACET_DEFS, LANG_COUNT } from "./lib/constants";
 import { computeResults, deriveOptions, emptyFilters, toggleFilter } from "./lib/boas";
+import useSession from "./hooks/useSession";
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
 import StatsStrip from "./components/StatsStrip";
 import Marquee from "./components/Marquee";
 import Toolbar from "./components/Toolbar";
+import LegendCards from "./components/LegendCards";
 import ResultsGrid from "./components/ResultsGrid";
 import ResultsTable from "./components/ResultsTable";
 import TierList from "./components/TierList";
 import Footer from "./components/Footer";
 import ToolModal from "./components/ToolModal";
+import TierMenu from "./components/TierMenu";
+import Toast from "./components/Toast";
 
 const MARQUEE_FALLBACK = ["Diabète", "Python", "OMOP", "Cartographie", "SAS", "Oncologie", "SNDS", "R", "Épidémiologie"];
 
@@ -27,6 +35,24 @@ export default function App() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [rotIndex, setRotIndex] = useState(0);
   const [countProgress, setCountProgress] = useState(0);
+  const [voteCounts, setVoteCounts] = useState({}); // { toolId: { up, down } }
+  const [myVotes, setMyVotes] = useState({});       // { toolId: 1 | -1 } (votes de ce navigateur)
+  const [voteBusy, setVoteBusy] = useState({});     // { toolId: "saving" | "error" }
+  const [legends, setLegends] = useState({ ...LEGEND_DEFAULTS });
+  const [tierMenu, setTierMenu] = useState(null);   // { id, top, left } (menu admin de rang)
+  const [toast, setToast] = useState(null);         // { type: "ok" | "err", message }
+  const toastTimer = useRef(null);
+
+  // Mode admin : session Supabase active (connexion via #/admin).
+  const session = useSession();
+  const admin = !!session;
+
+  const showToast = (type, message) => {
+    clearTimeout(toastTimer.current);
+    setToast({ type, message });
+    toastTimer.current = setTimeout(() => setToast(null), 2600);
+  };
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
 
   // Chargement des donnees : Supabase (JSON local si non configure).
   // Relance quand fetchAttempt change (bouton « Réessayer »), sans recharger la page.
@@ -46,6 +72,24 @@ export default function App() {
       });
     return () => { cancelled = true; };
   }, [fetchAttempt]);
+
+  // Compteurs de votes + votes deja poses par ce navigateur.
+  useEffect(() => {
+    let cancelled = false;
+    fetchVoteData().then(({ counts, mine }) => {
+      if (cancelled) return;
+      setVoteCounts(counts);
+      setMyVotes(mine);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Textes des cases de legende (editables en mode admin).
+  useEffect(() => {
+    let cancelled = false;
+    fetchLegends().then((l) => { if (!cancelled) setLegends(l); });
+    return () => { cancelled = true; };
+  }, []);
 
   // Mot du titre en rotation toutes les 2.4s.
   useEffect(() => {
@@ -86,17 +130,24 @@ export default function App() {
     return [...base, ...base];
   }, [tools]);
 
-  // Rangs officiels (EDS Limoges) : lus depuis la colonne tier de la base,
-  // modifiables uniquement depuis la page d'administration.
+  // Rangs officiels (EDS Limoges) : lus depuis la colonne tier de la base.
+  // En mode admin ils sont editables directement sur le site (badge/fiche).
   const ranks = useMemo(() => {
     const r = {};
     tools.forEach((t) => { if (t.tier) r[t.id] = t.tier; });
     return r;
   }, [tools]);
 
+  // Score net (pour - contre) par outil, pour le tri « votes du public ».
+  const voteScores = useMemo(() => {
+    const s = {};
+    for (const [id, c] of Object.entries(voteCounts)) s[id] = (c.up || 0) - (c.down || 0);
+    return s;
+  }, [voteCounts]);
+
   const results = useMemo(
-    () => computeResults(tools, { query, filters, sort, ranks }),
-    [tools, query, filters, sort, ranks]
+    () => computeResults(tools, { query, filters, sort, ranks, voteScores }),
+    [tools, query, filters, sort, ranks, voteScores]
   );
 
   const handleToggleFilter = (key, value) => setFilters((f) => toggleFilter(f, key, value));
@@ -117,6 +168,113 @@ export default function App() {
   const activeCount = FACET_DEFS.reduce((n, d) => n + (filters[d.key]?.length || 0), 0);
   const hasActive = activeCount > 0 || query.trim().length > 0 || sort !== "rank";
 
+  // Un vote, modifiable : cliquer l'autre fleche change le vote, recliquer la
+  // meme le retire. Mise a jour optimiste, retour en arriere si l'ecriture echoue.
+  const handleVote = async (toolId, value) => {
+    if (voteBusy[toolId] === "saving") return;
+    const prev = myVotes[toolId] ?? null;
+    const next = prev === value ? null : value; // re-clic sur le meme = retirer
+
+    const applyDelta = (c, from, to) => {
+      const cur = c[toolId] || { up: 0, down: 0 };
+      let { up, down } = cur;
+      if (from === 1) up -= 1;
+      if (from === -1) down -= 1;
+      if (to === 1) up += 1;
+      if (to === -1) down += 1;
+      return { ...c, [toolId]: { up: Math.max(0, up), down: Math.max(0, down) } };
+    };
+
+    setVoteBusy((b) => ({ ...b, [toolId]: "saving" }));
+    setMyVotes((m) => {
+      const n = { ...m };
+      if (next == null) delete n[toolId];
+      else n[toolId] = next;
+      return n;
+    });
+    setVoteCounts((c) => applyDelta(c, prev, next));
+
+    const res = next == null ? await removeVote(toolId) : await castVote(toolId, next);
+    if (res.ok) {
+      setVoteBusy((b) => { const n = { ...b }; delete n[toolId]; return n; });
+      return;
+    }
+    // echec : on remet tout comme avant
+    setMyVotes((m) => {
+      const n = { ...m };
+      if (prev == null) delete n[toolId];
+      else n[toolId] = prev;
+      return n;
+    });
+    setVoteCounts((c) => applyDelta(c, next, prev));
+    setVoteBusy((b) => ({ ...b, [toolId]: "error" }));
+  };
+
+  // Donnees de vote par outil, pretes a afficher.
+  const votes = useMemo(() => {
+    const v = {};
+    for (const t of tools) {
+      v[t.id] = {
+        up: voteCounts[t.id]?.up ?? 0,
+        down: voteCounts[t.id]?.down ?? 0,
+        mine: myVotes[t.id] ?? null,
+        saving: voteBusy[t.id] === "saving",
+        error: voteBusy[t.id] === "error",
+      };
+    }
+    return v;
+  }, [tools, voteCounts, myVotes, voteBusy]);
+
+  // --- Edition admin directement sur le site ---
+
+  const openTierMenu = (toolId, e) => {
+    e.stopPropagation();
+    if (tierMenu && tierMenu.id === toolId) { setTierMenu(null); return; }
+    let top = 90, left = 20;
+    const r = e.currentTarget && e.currentTarget.getBoundingClientRect && e.currentTarget.getBoundingClientRect();
+    if (r) {
+      top = Math.min(r.bottom + 8, window.innerHeight - 56);
+      left = Math.max(8, Math.min(r.left, window.innerWidth - 292));
+    }
+    setTierMenu({ id: toolId, top, left });
+  };
+
+  const updateTier = async (toolId, tier) => {
+    setTierMenu(null);
+    const tool = tools.find((t) => t.id === toolId);
+    const prev = tool?.tier ?? null;
+    if (tier === prev) return;
+    setTools((ts) => ts.map((t) => (t.id === toolId ? { ...t, tier } : t)));
+    const res = await saveTier(toolId, tier);
+    if (res.ok) {
+      showToast("ok", tier ? `Rang ${tier} enregistré` : "Rang retiré");
+    } else {
+      setTools((ts) => ts.map((t) => (t.id === toolId ? { ...t, tier: prev } : t)));
+      showToast("err", "Rang non enregistré (session expirée ?)");
+    }
+  };
+
+  const handleSaveLegend = async (key, body) => {
+    const res = await saveLegend(key, body);
+    if (res.ok) {
+      setLegends((l) => ({ ...l, [key]: body }));
+      showToast("ok", "Légende enregistrée");
+      return true;
+    }
+    showToast("err", "Légende non enregistrée (session expirée ?)");
+    return false;
+  };
+
+  const handleSignOut = async () => {
+    if (supabase) await supabase.auth.signOut();
+    showToast("ok", "Déconnecté — le site est repassé en lecture seule");
+  };
+
+  const compact = DENSITY === "Compact";
+  const showEmpty = status === "ready" && results.length === 0;
+  const selectedTool = tools.find((t) => t.id === selectedId) || null;
+  const menuTool = tierMenu ? tools.find((t) => t.id === tierMenu.id) : null;
+
   const cnt = (target) => String(Math.round((target || 0) * countProgress));
   const heroStats = [
     { n: cnt(total), l: "Algorithmes référencés" },
@@ -124,10 +282,6 @@ export default function App() {
     { n: cnt(LANG_COUNT), l: "Langages couverts" },
     { n: cnt(domainsCount), l: "Domaines médicaux" },
   ];
-
-  const compact = DENSITY === "Compact";
-  const showEmpty = status === "ready" && results.length === 0;
-  const selectedTool = tools.find((t) => t.id === selectedId) || null;
 
   return (
     <div style={{ minHeight: "100vh", position: "relative", overflow: "hidden" }}>
@@ -139,7 +293,7 @@ export default function App() {
       <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.5, backgroundImage: "radial-gradient(rgba(15,20,36,.05) 1px, transparent 1px)", backgroundSize: "26px 26px", WebkitMaskImage: "linear-gradient(180deg, #000 0%, transparent 60%)", maskImage: "linear-gradient(180deg, #000 0%, transparent 60%)" }} />
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1240, margin: "0 auto", padding: "0 28px" }}>
-        <Nav />
+        <Nav admin={admin} onSignOut={handleSignOut} />
 
         <Hero
           query={query}
@@ -169,7 +323,9 @@ export default function App() {
           toggleAdvanced={() => setShowAdvanced((s) => !s)}
         />
 
-        <main style={{ padding: "28px 0 10px", minHeight: "40vh" }}>
+        <LegendCards legends={legends} admin={admin} onSave={handleSaveLegend} />
+
+        <main style={{ padding: "20px 0 10px", minHeight: "40vh" }}>
           {status === "loading" && (
             <div style={{ textAlign: "center", padding: "80px 20px", color: "#667085", fontFamily: "'JetBrains Mono', monospace", fontSize: 14, animation: "boasFade .4s ease both" }}>
               Chargement du catalogue…
@@ -206,13 +362,16 @@ export default function App() {
             <ResultsGrid
               results={results}
               ranks={ranks}
+              votes={votes}
+              onVote={handleVote}
+              onTierClick={admin ? openTierMenu : undefined}
               compact={compact}
               onOpen={setSelectedId}
             />
           )}
 
           {status === "ready" && results.length > 0 && view === "table" && (
-            <ResultsTable results={results} onOpen={setSelectedId} />
+            <ResultsTable results={results} onOpen={setSelectedId} votes={votes} onVote={handleVote} />
           )}
 
           {status === "ready" && results.length > 0 && view === "tier" && (
@@ -220,6 +379,9 @@ export default function App() {
               results={results}
               ranks={ranks}
               onOpen={setSelectedId}
+              votes={votes}
+              onVote={handleVote}
+              onTierClick={admin ? openTierMenu : undefined}
             />
           )}
         </main>
@@ -232,8 +394,23 @@ export default function App() {
           tool={selectedTool}
           rank={ranks[selectedTool.id] || null}
           onClose={() => setSelectedId(null)}
+          vote={votes[selectedTool.id]}
+          onVote={handleVote}
+          admin={admin}
+          onPickTier={updateTier}
         />
       )}
+
+      {tierMenu && menuTool && (
+        <TierMenu
+          currentTier={menuTool.tier ?? null}
+          pos={{ top: tierMenu.top, left: tierMenu.left }}
+          onPick={(tier) => updateTier(tierMenu.id, tier)}
+          onClose={() => setTierMenu(null)}
+        />
+      )}
+
+      <Toast toast={toast} />
     </div>
   );
 }

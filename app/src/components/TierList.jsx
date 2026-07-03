@@ -3,7 +3,7 @@ import { TIERS } from "../lib/constants";
 
 // Tier list publique : affiche le classement OFFICIEL etabli par l'EDS Limoges
 // (colonne tier de la base). Lecture seule — l'edition se fait dans #/admin.
-export default function TierList({ results, ranks, onOpen }) {
+export default function TierList({ results, ranks, onOpen, votes, onVote, onTierClick }) {
   const unrankedItems = results.filter((t) => !ranks[t.id]);
   const allRanked = unrankedItems.length === 0;
 
@@ -34,6 +34,9 @@ export default function TierList({ results, ranks, onOpen }) {
                     tool={tool}
                     rank={ranks[tool.id]}
                     onOpen={() => onOpen(tool.id)}
+                    vote={votes[tool.id]}
+                    onVote={onVote}
+                    onTierClick={onTierClick}
                   />
                 ))}
                 {items.length === 0 && (
@@ -55,6 +58,9 @@ export default function TierList({ results, ranks, onOpen }) {
                 tool={tool}
                 rank={ranks[tool.id]}
                 onOpen={() => onOpen(tool.id)}
+                vote={votes[tool.id]}
+                onVote={onVote}
+                onTierClick={onTierClick}
               />
             ))}
             {allRanked && (

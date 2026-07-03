@@ -1,8 +1,8 @@
 import Hoverable from "./Hoverable";
 
-export default function Nav() {
+export default function Nav({ admin = false, onSignOut }) {
   return (
-    <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
+    <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 72, gap: 10, flexWrap: "wrap" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
         <div style={{ width: 30, height: 30, borderRadius: 9, background: "linear-gradient(140deg, #10b981, #059669)", display: "grid", placeItems: "center", boxShadow: "0 6px 16px rgba(16,185,129,.35)" }}>
           <div style={{ width: 11, height: 11, borderRadius: 3, background: "#fff" }} />
@@ -13,6 +13,11 @@ export default function Nav() {
         <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#667085", padding: "4px 9px", border: "1px solid #e6e8ec", borderRadius: 999, background: "#fff" }}>
           Health Data Hub
         </span>
+        {admin && (
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600, color: "#b45309", padding: "4px 9px", border: "1px solid #fde68a", borderRadius: 999, background: "#fffbeb" }}>
+            ● Mode admin
+          </span>
+        )}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <Hoverable
@@ -43,6 +48,16 @@ export default function Nav() {
         >
           Admin
         </Hoverable>
+        {admin && (
+          <Hoverable
+            as="button"
+            onClick={onSignOut}
+            style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13.5, fontWeight: 500, color: "#475467", padding: "8px 14px", borderWidth: 1, borderStyle: "solid", borderColor: "#e1e4ea", borderRadius: 9, background: "#fff", cursor: "pointer", fontFamily: "inherit" }}
+            hoverStyle={{ borderColor: "#d0d5dd", color: "#0f1424" }}
+          >
+            Se déconnecter
+          </Hoverable>
+        )}
       </div>
     </nav>
   );
