@@ -45,3 +45,9 @@ export const EDS_LIST = [
   { key: "bordeaux", label: "EDS Bordeaux", letter: "B", field: "tierBordeaux" },
   { key: "poitiers", label: "EDS Poitiers", letter: "P", field: "tierPoitiers" },
 ];
+
+// Classement Méthodo : qualité de la méthodologie / documentation (badge à part).
+export const METHODO = { key: "methodo", label: "Méthodo", letter: "M", field: "tierMethodo" };
+
+// Tous les classements éditables par l'admin (ordre d'affichage).
+export const RANKINGS = [METHODO, ...EDS_LIST];

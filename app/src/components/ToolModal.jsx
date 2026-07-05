@@ -1,6 +1,6 @@
 import Hoverable from "./Hoverable";
 import { badgeStyle, rankBubbleStyle } from "../lib/styles";
-import { ACCENT, EDS_LIST } from "../lib/constants";
+import { ACCENT, RANKINGS } from "../lib/constants";
 import VoteWidget from "./VoteWidget";
 import TierPicker from "./TierPicker";
 
@@ -83,7 +83,7 @@ export default function ToolModal({ tool, onClose, vote, onVote, admin = false, 
         </div>
 
         <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
-          {EDS_LIST.map((eds) => {
+          {RANKINGS.map((eds) => {
             const tier = tool[eds.field] ?? null;
             return (
               <div key={eds.key} style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px 12px" }}>
@@ -153,6 +153,20 @@ export default function ToolModal({ tool, onClose, vote, onVote, admin = false, 
             </div>
           ))}
         </div>
+
+        {filled(tool.methodoJustification) && (
+          <div style={{ marginTop: 16, background: "#fafbfc", border: "1px solid #eceef2", borderRadius: 16, padding: "18px 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 9 }}>
+              <span aria-hidden="true" style={{ display: "inline-flex", alignItems: "center", height: 22, borderRadius: 7, overflow: "hidden", border: "1px solid rgba(15,20,36,.14)", background: "#0f1424", color: "#fff", padding: "0 7px", fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 10.5, letterSpacing: ".05em", flex: "none" }}>
+                MÉTHODO
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11.5, textTransform: "uppercase", letterSpacing: ".06em", color: "#475467", fontWeight: 600 }}>
+                Justification méthodologique
+              </span>
+            </div>
+            <div style={{ fontSize: 14.5, lineHeight: 1.6, color: "#344054", textWrap: "pretty" }}>{tool.methodoJustification}</div>
+          </div>
+        )}
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 24 }}>
           {hasRepo && (

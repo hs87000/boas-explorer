@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { SELECT } from "../../lib/fetchTools";
-import { EDS_LIST, TIERS } from "../../lib/constants";
+import { RANKINGS, TIERS } from "../../lib/constants";
 import { saveTier } from "../../lib/tiers";
 import { statusColor } from "../../lib/boas";
 
@@ -91,13 +91,13 @@ export default function TierEditor() {
         Les rangs choisis ici sont enregistrés dans la base et deviennent les classements officiels.
       </p>
       <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "#98a2b3", margin: "0 0 20px" }}>
-        {EDS_LIST.map((eds) => `${eds.label} : ${rankedCount(eds)}/${tools.length}`).join(" · ")}
+        {RANKINGS.map((eds) => `${eds.label} : ${rankedCount(eds)}/${tools.length}`).join(" · ")}
       </p>
 
       <div style={{ background: "#fff", border: "1px solid #e8eaef", borderRadius: 18, overflow: "hidden" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 18px", borderBottom: "1px solid #eceef2", background: "#fafbfc", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, textTransform: "uppercase", letterSpacing: ".05em", color: "#98a2b3" }}>
           <span style={{ flex: 1 }}>Algorithme</span>
-          {EDS_LIST.map((eds) => (
+          {RANKINGS.map((eds) => (
             <span key={eds.key} style={{ width: 96, textAlign: "center", flex: "none" }}>{eds.label.replace("EDS ", "")}</span>
           ))}
         </div>
@@ -111,7 +111,7 @@ export default function TierEditor() {
               </span>
             </span>
 
-            {EDS_LIST.map((eds) => {
+            {RANKINGS.map((eds) => {
               const key = `${tool.id}:${eds.key}`;
               const cell = cells[key];
               const tier = tool[eds.field] ?? null;

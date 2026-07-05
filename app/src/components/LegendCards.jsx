@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EdsSampleBadge } from "./EdsTierBadge";
+import { EdsSampleBadge, MethodoBadge } from "./EdsTierBadge";
 
 const CARD = {
   background: "rgba(255,255,255,.7)",
@@ -99,6 +99,14 @@ export default function LegendCards({ legends, admin, onSave }) {
         title="Votes du public"
         contentKey="legend_votes"
         body={legends.legend_votes}
+        admin={admin}
+        onSave={onSave}
+      />
+      <LegendCard
+        sample={<MethodoBadge tier="S" />}
+        title="Classement Méthodo"
+        contentKey="legend_methodo"
+        body={legends.legend_methodo}
         admin={admin}
         onSave={onSave}
       />

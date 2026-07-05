@@ -4,7 +4,7 @@ import { castVote, fetchVoteData, removeVote } from "./lib/votes";
 import { fetchLegends, saveLegend, LEGEND_DEFAULTS } from "./lib/content";
 import { saveTier } from "./lib/tiers";
 import { supabase } from "./lib/supabase";
-import { ADVANCED_KEYS, DENSITY, EDS_LIST, FACET_DEFS, LANG_COUNT } from "./lib/constants";
+import { ADVANCED_KEYS, DENSITY, RANKINGS, FACET_DEFS, LANG_COUNT } from "./lib/constants";
 import { computeResults, deriveOptions, emptyFilters, toggleFilter } from "./lib/boas";
 import useSession from "./hooks/useSession";
 import Nav from "./components/Nav";
@@ -134,7 +134,7 @@ export default function App() {
   // En mode admin ils sont editables directement sur le site (badge/fiche).
   const ranksByEds = useMemo(() => {
     const r = {};
-    for (const eds of EDS_LIST) {
+    for (const eds of RANKINGS) {
       r[eds.key] = {};
       tools.forEach((t) => { if (t[eds.field]) r[eds.key][t.id] = t[eds.field]; });
     }
@@ -244,7 +244,7 @@ export default function App() {
 
   const updateTier = async (toolId, edsKey, tier) => {
     setTierMenu(null);
-    const eds = EDS_LIST.find((e) => e.key === edsKey);
+    const eds = RANKINGS.find((e) => e.key === edsKey);
     if (!eds) return;
     const tool = tools.find((t) => t.id === toolId);
     const prev = tool?.[eds.field] ?? null;
@@ -406,7 +406,7 @@ export default function App() {
 
       {tierMenu && menuTool && (
         <TierMenu
-          currentTier={menuTool[EDS_LIST.find((e) => e.key === tierMenu.eds)?.field] ?? null}
+          currentTier={menuTool[RANKINGS.find((e) => e.key === tierMenu.eds)?.field] ?? null}
           pos={{ top: tierMenu.top, left: tierMenu.left }}
           onPick={(tier) => updateTier(tierMenu.id, tierMenu.eds, tier)}
           onClose={() => setTierMenu(null)}

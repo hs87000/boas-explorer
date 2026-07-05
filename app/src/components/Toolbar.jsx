@@ -51,6 +51,7 @@ export default function Toolbar({
           aria-label="Trier"
           style={{ height: 42, border: "1px solid #e1e4ea", borderRadius: 11, background: "#fff", padding: "0 12px", fontSize: 14, color: "#344054", fontFamily: "inherit", cursor: "pointer", outline: 0 }}
         >
+          <option value="rank_methodo">Trier : rang Méthodo (S → F)</option>
           <option value="rank">Trier : rang EDS Limoges (S → F)</option>
           <option value="rank_bordeaux">Trier : rang EDS Bordeaux (S → F)</option>
           <option value="rank_poitiers">Trier : rang EDS Poitiers (S → F)</option>

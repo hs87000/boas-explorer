@@ -5,6 +5,7 @@ const COLUMN_BY_EDS = {
   limoges: "tier",
   bordeaux: "tier_bordeaux",
   poitiers: "tier_poitiers",
+  methodo: "tier_methodo",
 };
 
 // Enregistre le rang officiel d'un outil pour un EDS donne (admin connecte

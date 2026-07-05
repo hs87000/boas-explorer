@@ -5,6 +5,7 @@ import { supabase } from "./supabase";
 // les cases s'affichent toujours.
 export const LEGEND_DEFAULTS = {
   legend_votes: "Donnez votre avis : ▲ si l'outil vous paraît utile, ▼ sinon. Un vote par appareil, modifiable à tout moment.",
+  legend_methodo: "Le badge Méthodo note la qualité de la méthodologie et le niveau de détail de la documentation de chaque outil, de S (référence) à F. La justification détaillée est dans la fiche de chaque outil.",
   legend_eds: "Le segment L du badge indique le rang officiel attribué par l'équipe de l'Entrepôt de Données de Santé du CHU de Limoges, de S (référence) à F.",
   legend_eds_bordeaux: "Le segment B du badge indique le rang attribué par l'équipe de l'Entrepôt de Données de Santé du CHU de Bordeaux, de S (référence) à F.",
   legend_eds_poitiers: "Le segment P du badge indique le rang attribué par l'équipe de l'Entrepôt de Données de Santé du CHU de Poitiers, de S (référence) à F.",

@@ -3,7 +3,7 @@ import useHover from "../hooks/useHover";
 import { badgeStyle, cardBaseStyle, glowColor } from "../lib/styles";
 import { ACCENT } from "../lib/constants";
 import VoteWidget from "./VoteWidget";
-import EdsTierBadge from "./EdsTierBadge";
+import EdsTierBadge, { MethodoBadge } from "./EdsTierBadge";
 
 export default function ToolCard({ tool, index, onOpen, vote, onVote, onTierClick }) {
   const [hovered, hoverHandlers] = useHover();
@@ -47,6 +47,10 @@ export default function ToolCard({ tool, index, onOpen, vote, onVote, onTierClic
             saving={vote?.saving ?? false}
             error={vote?.error ?? false}
             onVote={(value) => onVote(tool.id, value)}
+          />
+          <MethodoBadge
+            tier={tool.tierMethodo}
+            onPick={onTierClick ? (edsKey, e) => onTierClick(tool.id, edsKey, e) : undefined}
           />
           <EdsTierBadge
             tiers={{ limoges: tool.tier, bordeaux: tool.tierBordeaux, poitiers: tool.tierPoitiers }}

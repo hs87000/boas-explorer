@@ -74,6 +74,7 @@ export function computeResults(tools, { query, filters, sort, ranksByEds = {}, v
     if (sort === "rank") return (tierOrder(ranksByEds.limoges, a.id) - tierOrder(ranksByEds.limoges, b.id)) || byName(a, b);
     if (sort === "rank_bordeaux") return (tierOrder(ranksByEds.bordeaux, a.id) - tierOrder(ranksByEds.bordeaux, b.id)) || byName(a, b);
     if (sort === "rank_poitiers") return (tierOrder(ranksByEds.poitiers, a.id) - tierOrder(ranksByEds.poitiers, b.id)) || byName(a, b);
+    if (sort === "rank_methodo") return (tierOrder(ranksByEds.methodo, a.id) - tierOrder(ranksByEds.methodo, b.id)) || byName(a, b);
     if (sort === "votes") return ((voteScores[b.id] ?? 0) - (voteScores[a.id] ?? 0)) || byName(a, b);
     if (sort === "val") return (VAL_ORDER[a.validation] - VAL_ORDER[b.validation]) || byName(a, b);
     if (sort === "update") return (parseDate(b.lastUpdate) - parseDate(a.lastUpdate)) || byName(a, b);

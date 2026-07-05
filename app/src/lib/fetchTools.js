@@ -29,6 +29,8 @@ export const SELECT = [
   "tier",
   "tierBordeaux:tier_bordeaux",
   "tierPoitiers:tier_poitiers",
+  "tierMethodo:tier_methodo",
+  "methodoJustification:methodo_justification",
 ].join(", ");
 
 // Charge les outils depuis Supabase.

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import TierItem from "./TierItem";
-import { EDS_LIST, TIERS } from "../lib/constants";
+import { RANKINGS, TIERS } from "../lib/constants";
 
 const CHIP_BASE = {
   fontFamily: "inherit",
@@ -17,8 +17,8 @@ const CHIP_BASE = {
 // (Limoges / Bordeaux / Poitiers). Lecture seule — en mode admin, la bulle
 // de rang de chaque outil est cliquable pour classer dans l'EDS affiche.
 export default function TierList({ results, ranksByEds, onOpen, votes, onVote, onTierClick }) {
-  const [selectedEds, setSelectedEds] = useState("limoges");
-  const eds = EDS_LIST.find((e) => e.key === selectedEds);
+  const [selectedEds, setSelectedEds] = useState("methodo");
+  const eds = RANKINGS.find((e) => e.key === selectedEds);
   const ranks = ranksByEds[selectedEds] || {};
 
   const unrankedItems = results.filter((t) => !ranks[t.id]);
@@ -32,8 +32,8 @@ export default function TierList({ results, ranksByEds, onOpen, votes, onVote, o
           Classement officiel · {eds.label}
         </span>
 
-        <div style={{ display: "flex", gap: 7 }} role="tablist" aria-label="Choisir l'EDS affiché">
-          {EDS_LIST.map((e) => (
+        <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }} role="tablist" aria-label="Choisir le classement affiché">
+          {RANKINGS.map((e) => (
             <button
               key={e.key}
               role="tab"
@@ -51,7 +51,9 @@ export default function TierList({ results, ranksByEds, onOpen, votes, onVote, o
         </div>
 
         <span style={{ fontSize: 13.5, color: "#667085" }}>
-          Tier list établie par l'équipe de l'{eds.label} (S = meilleur).
+          {eds.key === "methodo"
+            ? "Classement selon la qualité de la méthodologie et de la documentation (S = meilleur)."
+            : `Tier list établie par l'équipe de l'${eds.label} (S = meilleur).`}
         </span>
       </div>
 
