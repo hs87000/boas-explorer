@@ -1,10 +1,12 @@
 import { supabase } from "./supabase";
-import { getDeviceId } from "./device";
 
 // Les votes passent par deux fonctions cote base (cast_vote / remove_vote) qui
-// ne touchent que la ligne de CET appareil. La table brute n'est pas lisible :
-// on affiche les totaux via la vue vote_counts, et on memorise "mes votes"
-// en localStorage (meme duree de vie que l'identifiant d'appareil).
+// identifient l'appelant via auth.uid() — la session verifiee par Supabase
+// (connexion anonyme silencieuse, voir useSession.js), jamais via une valeur
+// fournie par le client. La table brute n'est pas lisible : on affiche les
+// totaux via la vue vote_counts, et on memorise "mes votes" en localStorage
+// UNIQUEMENT pour l'affichage (quel bouton surligner) — ca n'a aucun role
+// de securite.
 
 const MY_VOTES_KEY = "boas-my-votes";
 
@@ -42,11 +44,12 @@ export async function fetchVoteData() {
 }
 
 // Voter ou changer son vote (1 = pour, -1 = contre).
+// L'identite (auth.uid()) est deduite cote serveur de la session en cours ;
+// aucun identifiant n'est envoye par le client.
 export async function castVote(toolId, value) {
   if (!supabase) return { ok: false };
   const { error } = await supabase.rpc("cast_vote", {
     p_tool_id: toolId,
-    p_device_id: getDeviceId(),
     p_value: value,
   });
   if (error) {
@@ -60,10 +63,7 @@ export async function castVote(toolId, value) {
 // Retirer son vote.
 export async function removeVote(toolId) {
   if (!supabase) return { ok: false };
-  const { error } = await supabase.rpc("remove_vote", {
-    p_tool_id: toolId,
-    p_device_id: getDeviceId(),
-  });
+  const { error } = await supabase.rpc("remove_vote", { p_tool_id: toolId });
   if (error) {
     console.warn("[BOAS] Vote non retire :", error.message);
     return { ok: false };

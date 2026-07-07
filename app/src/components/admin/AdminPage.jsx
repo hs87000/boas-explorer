@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
-import useSession from "../../hooks/useSession";
+import useSession, { isAdminSession } from "../../hooks/useSession";
 import LoginForm from "./LoginForm";
 import TierEditor from "./TierEditor";
 
 export default function AdminPage() {
   const session = useSession();
+  // Tout visiteur a desormais une session (anonyme, pour voter) : il ne
+  // faut PAS montrer l'editeur a une session anonyme, seulement a une
+  // vraie connexion email/mot de passe.
+  const admin = isAdminSession(session);
   const [signingOut, setSigningOut] = useState(false);
 
   const signOut = async () => {
@@ -36,7 +40,7 @@ export default function AdminPage() {
             <a href="#/" style={{ fontSize: 13.5, color: "#475467", textDecoration: "none", fontWeight: 500 }}>
               ← Retour au site
             </a>
-            {session && (
+            {admin && (
               <>
                 <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "#98a2b3" }}>
                   {session.user?.email}
@@ -61,7 +65,7 @@ export default function AdminPage() {
           <div style={{ textAlign: "center", padding: "80px 20px", color: "#667085", fontFamily: "'JetBrains Mono', monospace", fontSize: 14 }}>
             Vérification de la session…
           </div>
-        ) : session ? (
+        ) : admin ? (
           <TierEditor />
         ) : (
           <LoginForm />

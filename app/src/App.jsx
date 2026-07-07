@@ -6,7 +6,7 @@ import { saveTier } from "./lib/tiers";
 import { supabase } from "./lib/supabase";
 import { ADVANCED_KEYS, DENSITY, RANKINGS, FACET_DEFS, LANG_COUNT } from "./lib/constants";
 import { computeResults, deriveOptions, emptyFilters, toggleFilter } from "./lib/boas";
-import useSession from "./hooks/useSession";
+import useSession, { isAdminSession } from "./hooks/useSession";
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
 import StatsStrip from "./components/StatsStrip";
@@ -45,7 +45,9 @@ export default function App() {
 
   // Mode admin : session Supabase active (connexion via #/admin).
   const session = useSession();
-  const admin = !!session;
+  // Tout visiteur a desormais une session (anonyme, pour voter) : seule une
+  // session reelle (email/mot de passe) donne les droits admin.
+  const admin = isAdminSession(session);
 
   const showToast = (type, message) => {
     clearTimeout(toastTimer.current);
