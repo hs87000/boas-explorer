@@ -26,7 +26,7 @@ export const SELECT = [
   "inclusion",
   "exclusion",
   "inputData:input_data",
-  "tier",
+  "tierLimoges:tier_limoges",
   "tierBordeaux:tier_bordeaux",
   "tierPoitiers:tier_poitiers",
   "tierMethodo:tier_methodo",

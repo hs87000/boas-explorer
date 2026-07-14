@@ -2,7 +2,7 @@ import { supabase } from "./supabase";
 
 // Colonne SQL correspondant a chaque EDS.
 const COLUMN_BY_EDS = {
-  limoges: "tier",
+  limoges: "tier_limoges",
   bordeaux: "tier_bordeaux",
   poitiers: "tier_poitiers",
   methodo: "tier_methodo",

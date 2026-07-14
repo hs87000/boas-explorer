@@ -41,7 +41,7 @@ export const TIER_ORDER = { S: 0, A: 1, B: 2, C: 3, D: 4, F: 5 };
 // Les Entrepôts de Données de Santé qui publient un classement.
 // field = nom du champ côté front, letter = lettre du segment sur le badge.
 export const EDS_LIST = [
-  { key: "limoges", label: "EDS Limoges", letter: "L", field: "tier" },
+  { key: "limoges", label: "EDS Limoges", letter: "L", field: "tierLimoges" },
   { key: "bordeaux", label: "EDS Bordeaux", letter: "B", field: "tierBordeaux" },
   { key: "poitiers", label: "EDS Poitiers", letter: "P", field: "tierPoitiers" },
 ];

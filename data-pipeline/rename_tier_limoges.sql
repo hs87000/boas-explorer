@@ -1,0 +1,22 @@
+-- ============================================================
+-- Renommage de la colonne "tier" en "tier_limoges" (table tools).
+--
+-- DEJA EXECUTE dans l'editeur SQL du dashboard Supabase par l'auteur
+-- le 14/07/2026 : ce fichier est la trace de l'operation dans le depot
+-- (regle CLAUDE.md), il n'y a RIEN a re-executer.
+--
+-- Pourquoi : "tier" etait le classement EDS Limoges, premier classement
+-- historique du projet, cree avant les autres et donc sans suffixe de
+-- ville — contrairement a tier_bordeaux, tier_poitiers et tier_methodo.
+-- On uniformise le nommage AVANT la mise en place des roles EDS
+-- multiples (un compte par CHU, chacun limite a sa propre colonne) :
+-- les futures policies par ville seront plus simples a ecrire et a
+-- relire si chaque colonne nomme explicitement son EDS.
+--
+-- Mises a jour front correspondantes (meme commit) :
+--   app/src/lib/fetchTools.js, app/src/lib/constants.js,
+--   app/src/lib/tiers.js, app/src/components/ToolCard.jsx,
+--   app/scripts/import-supabase.mjs
+-- ============================================================
+
+alter table public.tools rename column tier to tier_limoges;

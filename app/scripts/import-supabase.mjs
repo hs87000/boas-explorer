@@ -58,7 +58,7 @@ const rows = tools.map((t) => ({
   inclusion: t.inclusion || null,
   exclusion: t.exclusion || null,
   input_data: t.inputData || null,
-  tier: null, // aucun outil classe au depart
+  tier_limoges: null, // aucun outil classe au depart
 }));
 
 const supabase = createClient(url, secretKey);

@@ -53,7 +53,7 @@ export default function ToolCard({ tool, index, onOpen, vote, onVote, onTierClic
             onPick={onTierClick ? (edsKey, e) => onTierClick(tool.id, edsKey, e) : undefined}
           />
           <EdsTierBadge
-            tiers={{ limoges: tool.tier, bordeaux: tool.tierBordeaux, poitiers: tool.tierPoitiers }}
+            tiers={{ limoges: tool.tierLimoges, bordeaux: tool.tierBordeaux, poitiers: tool.tierPoitiers }}
             onPick={onTierClick ? (edsKey, e) => onTierClick(tool.id, edsKey, e) : undefined}
           />
         </div>
