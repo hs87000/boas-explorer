@@ -34,6 +34,9 @@ par l'auteur.
   l'utilisateur autorisé accepté — idéalement testé en conditions réelles
   (appel direct à l'API), pas seulement supposé à partir du code
 - `.env` toujours exclu du Git, vérifié via `git status` avant chaque commit
+- Tout SQL destiné à être exécuté manuellement (SQL Editor du dashboard)
+  est d'abord sauvegardé en fichier dans `data-pipeline/`, jamais exécuté
+  depuis un simple copier-coller sans laisser de trace dans le dépôt
 
 ## Workflow établi avec l'auteur
 - L'auteur ne code pas lui-même : il comprend et valide l'architecture,
@@ -62,6 +65,9 @@ par l'auteur.
    Poitiers, chacun ne pouvant modifier que son propre classement —
    schéma exact (colonnes séparées vs table dédiée) à confirmer avant
    de coder quoi que ce soit
+   - Sous-tâche : une fois la table des rôles en place, remplacer
+     l'UUID brut affiché dans l'historique (`audit_log`) par un nom
+     lisible (ex: "Bordeaux", "Poitiers", "Limoges", "Admin")
 2. MFA (TOTP) sur le compte admin principal
 3. `npm audit` / `npm audit fix`
 4. Audit RLS complet sur toutes les tables (une fois le point 1 en place)

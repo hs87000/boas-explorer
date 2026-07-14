@@ -1,11 +1,51 @@
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import useSession, { isAdminSession } from "../../hooks/useSession";
+import useHashRoute from "../../hooks/useHashRoute";
 import LoginForm from "./LoginForm";
 import TierEditor from "./TierEditor";
+import AuditLog from "./AuditLog";
+
+// Onglets internes de l'administration : classements (#/admin) et
+// historique des modifications (#/admin/historique). Simples liens hash,
+// visibles uniquement une fois connecte en admin.
+const ADMIN_TABS = [
+  { key: "classements", label: "Classements", href: "#/admin" },
+  { key: "historique", label: "Historique", href: "#/admin/historique" },
+];
+
+function AdminTabs({ active }) {
+  return (
+    <div style={{ display: "flex", gap: 8, margin: "4px 0 22px" }}>
+      {ADMIN_TABS.map((tab) => {
+        const isActive = tab.key === active;
+        return (
+          <a
+            key={tab.key}
+            href={tab.href}
+            aria-current={isActive ? "page" : undefined}
+            style={{
+              display: "inline-flex", alignItems: "center", height: 34, padding: "0 16px",
+              borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: "none",
+              fontFamily: "inherit",
+              color: isActive ? "#fff" : "#475467",
+              background: isActive ? "linear-gradient(140deg, #10b981, #059669)" : "#fff",
+              border: isActive ? "1px solid transparent" : "1px solid #e1e4ea",
+              boxShadow: isActive ? "0 6px 16px rgba(16,185,129,.25)" : "none",
+            }}
+          >
+            {tab.label}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function AdminPage() {
   const session = useSession();
+  const hash = useHashRoute();
+  const tab = hash.startsWith("#/admin/historique") ? "historique" : "classements";
   // Tout visiteur a desormais une session (anonyme, pour voter) : il ne
   // faut PAS montrer l'editeur a une session anonyme, seulement a une
   // vraie connexion email/mot de passe.
@@ -66,7 +106,10 @@ export default function AdminPage() {
             Vérification de la session…
           </div>
         ) : admin ? (
-          <TierEditor />
+          <>
+            <AdminTabs active={tab} />
+            {tab === "historique" ? <AuditLog /> : <TierEditor />}
+          </>
         ) : (
           <LoginForm />
         )}
