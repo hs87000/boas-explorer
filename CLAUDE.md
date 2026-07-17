@@ -68,6 +68,11 @@ par l'auteur.
    - Sous-tâche : une fois la table des rôles en place, remplacer
      l'UUID brut affiché dans l'historique (`audit_log`) par un nom
      lisible (ex: "Bordeaux", "Poitiers", "Limoges", "Admin")
+   - Note : Supabase Auth exige un email ou téléphone, pas de nom
+     d'utilisateur pur. Les 3 comptes EDS utilisent des emails
+     placeholder sur domaine réservé (`@boas-explorer.test`, RFC 2606)
+     avec Auto Confirm — ces adresses n'ont pas besoin d'exister
+     réellement, seul le mot de passe compte
 2. MFA (TOTP) sur le compte admin principal
 3. `npm audit` / `npm audit fix`
 4. Audit RLS complet sur toutes les tables (une fois le point 1 en place)

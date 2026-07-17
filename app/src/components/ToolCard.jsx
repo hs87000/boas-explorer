@@ -5,7 +5,7 @@ import { ACCENT } from "../lib/constants";
 import VoteWidget from "./VoteWidget";
 import EdsTierBadge, { MethodoBadge } from "./EdsTierBadge";
 
-export default function ToolCard({ tool, index, onOpen, vote, onVote, onTierClick }) {
+export default function ToolCard({ tool, index, onOpen, vote, onVote, onTierClick, canEditTier }) {
   const [hovered, hoverHandlers] = useHover();
   const glowRef = useRef(null);
 
@@ -51,10 +51,12 @@ export default function ToolCard({ tool, index, onOpen, vote, onVote, onTierClic
           <MethodoBadge
             tier={tool.tierMethodo}
             onPick={onTierClick ? (edsKey, e) => onTierClick(tool.id, edsKey, e) : undefined}
+            canEdit={canEditTier ? canEditTier("methodo") : true}
           />
           <EdsTierBadge
             tiers={{ limoges: tool.tierLimoges, bordeaux: tool.tierBordeaux, poitiers: tool.tierPoitiers }}
             onPick={onTierClick ? (edsKey, e) => onTierClick(tool.id, edsKey, e) : undefined}
+            canEdit={canEditTier}
           />
         </div>
         <span style={badgeStyle(tool.validation, ACCENT)}>{tool.validation}</span>

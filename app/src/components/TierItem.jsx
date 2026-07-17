@@ -3,10 +3,13 @@ import { rankBubbleStyle } from "../lib/styles";
 import { statusColor } from "../lib/boas";
 import VoteWidget from "./VoteWidget";
 
-// Vignette d'un outil dans la tier list publique. Le rang officiel (EDS
-// Limoges) est en lecture seule ; en mode admin (onTierClick fourni), la
-// bulle de rang devient cliquable pour ouvrir le menu de classement.
-export default function TierItem({ tool, rank, onOpen, vote, onVote, onTierClick }) {
+// Vignette d'un outil dans la tier list publique. Le rang officiel est en
+// lecture seule ; en mode edition (onTierClick fourni), la bulle de rang
+// devient cliquable pour ouvrir le menu de classement. readOnly : mode
+// edition mais colonne hors droits pour ce compte (EDS d'une autre ville) —
+// bulle attenuee + infobulle explicite. Confort d'affichage uniquement, la
+// vraie barriere reste le trigger cote base.
+export default function TierItem({ tool, rank, onOpen, vote, onVote, onTierClick, readOnly = false }) {
   const adminBubble = typeof onTierClick === "function";
 
   return (
@@ -22,14 +25,17 @@ export default function TierItem({ tool, rank, onOpen, vote, onVote, onTierClick
         <button
           type="button"
           onClick={(e) => onTierClick(tool.id, e)}
-          title="Mode admin : cliquez pour modifier le rang"
+          title="Mode édition : cliquez pour modifier le rang"
           aria-label={`Modifier le rang de ${tool.name}`}
           style={{ ...rankBubbleStyle(rank, 24), boxShadow: "0 0 0 2px rgba(16,185,129,.25)" }}
         >
           {rank || "–"}
         </button>
       ) : (
-        <span style={{ ...rankBubbleStyle(rank, 24), cursor: "default" }}>
+        <span
+          title={readOnly ? "Lecture seule pour ce compte" : undefined}
+          style={{ ...rankBubbleStyle(rank, 24), cursor: "default", ...(readOnly ? { opacity: 0.45 } : {}) }}
+        >
           {rank || "–"}
         </span>
       )}

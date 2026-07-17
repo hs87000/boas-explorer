@@ -7,6 +7,8 @@ import { supabase } from "./lib/supabase";
 import { ADVANCED_KEYS, DENSITY, RANKINGS, FACET_DEFS, LANG_COUNT } from "./lib/constants";
 import { computeResults, deriveOptions, emptyFilters, toggleFilter } from "./lib/boas";
 import useSession, { isAdminSession } from "./hooks/useSession";
+import useEditorRole from "./hooks/useEditorRole";
+import { canEditRanking } from "./lib/roles";
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
 import StatsStrip from "./components/StatsStrip";
@@ -48,6 +50,15 @@ export default function App() {
   // Tout visiteur a desormais une session (anonyme, pour voter) : seule une
   // session reelle (email/mot de passe) donne les droits admin.
   const admin = isAdminSession(session);
+
+  // Role d'edition (admin complet ou compte EDS limite a sa colonne),
+  // meme donnee que dans l'editeur admin (hooks/useEditorRole.js).
+  // Confort d'AFFICHAGE uniquement : la vraie barriere reste le trigger
+  // cote base, qui rejetterait toute ecriture hors droits.
+  const role = useEditorRole(session);
+  // Mode edition sur le site : session reelle ET role charge.
+  const editMode = admin && role !== undefined;
+  const canEditTier = (edsKey) => canEditRanking(role, edsKey);
 
   const showToast = (type, message) => {
     clearTimeout(toastTimer.current);
@@ -370,7 +381,8 @@ export default function App() {
               results={results}
               votes={votes}
               onVote={handleVote}
-              onTierClick={admin ? openTierMenu : undefined}
+              onTierClick={editMode ? openTierMenu : undefined}
+              canEditTier={canEditTier}
               compact={compact}
               onOpen={setSelectedId}
             />
@@ -387,7 +399,8 @@ export default function App() {
               onOpen={setSelectedId}
               votes={votes}
               onVote={handleVote}
-              onTierClick={admin ? openTierMenu : undefined}
+              onTierClick={editMode ? openTierMenu : undefined}
+              canEditTier={canEditTier}
             />
           )}
         </main>
@@ -401,7 +414,8 @@ export default function App() {
           onClose={() => setSelectedId(null)}
           vote={votes[selectedTool.id]}
           onVote={handleVote}
-          admin={admin}
+          admin={editMode}
+          canEditTier={canEditTier}
           onPickTier={updateTier}
         />
       )}

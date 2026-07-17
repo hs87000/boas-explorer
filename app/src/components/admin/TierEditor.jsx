@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase";
 import { SELECT } from "../../lib/fetchTools";
 import { RANKINGS, TIERS } from "../../lib/constants";
 import { saveTier } from "../../lib/tiers";
+import { canEditRanking } from "../../lib/roles";
 import { statusColor } from "../../lib/boas";
 
 const TIER_COLOR = Object.fromEntries(TIERS.map((t) => [t.key, t.color]));
@@ -10,7 +11,13 @@ const TIER_COLOR = Object.fromEntries(TIERS.map((t) => [t.key, t.color]));
 // Editeur en masse des tier lists OFFICIELLES (Limoges, Bordeaux, Poitiers) :
 // un menu deroulant par outil et par EDS, chaque changement fait un UPDATE
 // dans la table tools. L'edition est aussi possible directement sur le site.
-export default function TierEditor() {
+//
+// role (voir lib/roles.js) decide quelles colonnes sont presentees comme
+// modifiables : tout pour l'admin, seulement sa colonne pour un compte EDS,
+// rien pour un compte sans droit. C'est un confort d'AFFICHAGE uniquement —
+// la vraie barriere est cote base (trigger + policies RLS) : meme sans ce
+// filtre, une ecriture hors droits serait rejetee a l'enregistrement.
+export default function TierEditor({ role }) {
   const [tools, setTools] = useState([]);
   const [status, setStatus] = useState("loading"); // "loading" | "error" | "ready"
   const [fetchAttempt, setFetchAttempt] = useState(0);
@@ -85,11 +92,23 @@ export default function TierEditor() {
 
   const rankedCount = (eds) => tools.filter((t) => t[eds.field]).length;
 
+  // Un compte EDS ne peut editer que sa propre colonne ; l'admin edite tout.
+  // Regle partagee avec les badges du site public (lib/roles.js).
+  const canEdit = (edsKey) => canEditRanking(role, edsKey);
+  const editableLabels = RANKINGS.filter((eds) => canEdit(eds.key)).map((eds) => eds.label);
+
   return (
     <div style={{ paddingBottom: 60 }}>
       <p style={{ color: "#667085", fontSize: 13.5, lineHeight: 1.55, maxWidth: "80ch", margin: "0 0 8px" }}>
         Les rangs choisis ici sont enregistrés dans la base et deviennent les classements officiels.
       </p>
+      {!role?.admin && (
+        <p style={{ color: "#b45309", fontSize: 13, lineHeight: 1.55, maxWidth: "80ch", margin: "0 0 8px", padding: "8px 12px", border: "1px solid #fde68a", borderRadius: 10, background: "#fffbeb" }}>
+          {editableLabels.length > 0
+            ? `Compte ${editableLabels.join(", ")} : seule cette colonne est modifiable, les autres sont en lecture seule.`
+            : "Compte sans droit d'édition : toutes les colonnes sont en lecture seule."}
+        </p>
+      )}
       <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "#98a2b3", margin: "0 0 20px" }}>
         {RANKINGS.map((eds) => `${eds.label} : ${rankedCount(eds)}/${tools.length}`).join(" · ")}
       </p>
@@ -115,6 +134,25 @@ export default function TierEditor() {
               const key = `${tool.id}:${eds.key}`;
               const cell = cells[key];
               const tier = tool[eds.field] ?? null;
+
+              // Colonne hors droits : valeur affichee sans menu (lecture
+              // seule). Confort d'affichage uniquement — la vraie barriere
+              // est le trigger cote base, qui rejetterait l'ecriture.
+              if (!canEdit(eds.key)) {
+                return (
+                  <span key={eds.key} style={{ width: 96, flex: "none", display: "inline-flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
+                    <span aria-hidden="true" style={{ width: 10, height: 10, borderRadius: 3, flex: "none", background: tier ? TIER_COLOR[tier] : "#e8eaef" }} />
+                    <span
+                      title={`${eds.label} : lecture seule pour ce compte`}
+                      aria-label={`Rang ${eds.label} de ${tool.name} (lecture seule)`}
+                      style={{ height: 30, width: 62, display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px dashed #e1e4ea", borderRadius: 8, background: "#fafbfc", fontSize: 13, color: "#98a2b3" }}
+                    >
+                      {tier ?? "—"}
+                    </span>
+                  </span>
+                );
+              }
+
               return (
                 <span key={eds.key} style={{ width: 96, flex: "none", display: "inline-flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
                   <span

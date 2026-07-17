@@ -14,12 +14,21 @@ const CHIP_BASE = {
 };
 
 // Tier list publique : affiche le classement OFFICIEL de l'EDS selectionne
-// (Limoges / Bordeaux / Poitiers). Lecture seule — en mode admin, la bulle
-// de rang de chaque outil est cliquable pour classer dans l'EDS affiche.
-export default function TierList({ results, ranksByEds, onOpen, votes, onVote, onTierClick }) {
+// (Limoges / Bordeaux / Poitiers). Lecture seule — en mode edition, la bulle
+// de rang de chaque outil est cliquable pour classer dans l'EDS affiche,
+// seulement si canEditTier autorise cette colonne (compte EDS limite a la
+// sienne, admin partout). Confort d'AFFICHAGE uniquement : la vraie
+// barriere reste le trigger cote base.
+export default function TierList({ results, ranksByEds, onOpen, votes, onVote, onTierClick, canEditTier }) {
   const [selectedEds, setSelectedEds] = useState("methodo");
   const eds = RANKINGS.find((e) => e.key === selectedEds);
   const ranks = ranksByEds[selectedEds] || {};
+
+  // Le classement affiche est-il editable par le compte connecte ?
+  const editableHere = !!onTierClick && (canEditTier ? canEditTier(selectedEds) : true);
+  const itemTierClick = editableHere ? (toolId, e) => onTierClick(toolId, selectedEds, e) : undefined;
+  // readOnly : en mode edition mais sur une colonne hors droits -> infobulle explicite.
+  const itemReadOnly = !!onTierClick && !editableHere;
 
   const unrankedItems = results.filter((t) => !ranks[t.id]);
   const allRanked = unrankedItems.length === 0;
@@ -74,7 +83,8 @@ export default function TierList({ results, ranksByEds, onOpen, votes, onVote, o
                     onOpen={() => onOpen(tool.id)}
                     vote={votes[tool.id]}
                     onVote={onVote}
-                    onTierClick={onTierClick ? (toolId, e) => onTierClick(toolId, selectedEds, e) : undefined}
+                    onTierClick={itemTierClick}
+                    readOnly={itemReadOnly}
                   />
                 ))}
                 {items.length === 0 && (
@@ -98,7 +108,8 @@ export default function TierList({ results, ranksByEds, onOpen, votes, onVote, o
                 onOpen={() => onOpen(tool.id)}
                 vote={votes[tool.id]}
                 onVote={onVote}
-                onTierClick={onTierClick ? (toolId, e) => onTierClick(toolId, selectedEds, e) : undefined}
+                onTierClick={itemTierClick}
+                readOnly={itemReadOnly}
               />
             ))}
             {allRanked && (

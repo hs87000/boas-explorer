@@ -5,12 +5,16 @@ const TIER_COLOR = Object.fromEntries(TIERS.map((t) => [t.key, t.color]));
 // Pastille compacte des rangs officiels : [EDS][L·S][B·A][P·–].
 // Un segment par Entrepot de Donnees de Sante (lettre de la ville + rang,
 // colore par le tier). Detail complet dans l'infobulle de chaque segment.
-// En mode admin (onPick fourni), chaque segment ville devient un bouton qui
-// ouvre le menu de classement de CET EDS.
-export default function EdsTierBadge({ tiers = {}, size = 24, onPick }) {
-  const clickable = typeof onPick === "function";
+// En mode edition (onPick fourni), chaque segment ville devient un bouton
+// qui ouvre le menu de classement de CET EDS — sauf si canEdit(cle) est
+// faux (compte EDS limite a sa colonne) : le segment reste alors en
+// lecture seule, attenue, avec une infobulle explicite. Confort
+// d'AFFICHAGE uniquement : la vraie barriere reste le trigger cote base.
+export default function EdsTierBadge({ tiers = {}, size = 24, onPick, canEdit }) {
+  const editMode = typeof onPick === "function";
+  const may = (edsKey) => (canEdit ? canEdit(edsKey) : true);
 
-  const segStyle = (tier) => ({
+  const segStyle = (tier, pointer) => ({
     background: tier ? TIER_COLOR[tier] : "#f1f3f6",
     color: tier ? "#0f1424" : "#aab2bf",
     minWidth: 26,
@@ -25,7 +29,7 @@ export default function EdsTierBadge({ tiers = {}, size = 24, onPick }) {
     fontWeight: 700,
     fontSize: 11,
     lineHeight: 1,
-    cursor: clickable ? "pointer" : "default",
+    cursor: pointer ? "pointer" : "default",
   });
 
   return (
@@ -38,7 +42,7 @@ export default function EdsTierBadge({ tiers = {}, size = 24, onPick }) {
         overflow: "hidden",
         border: "1px solid rgba(15,20,36,.14)",
         flex: "none",
-        ...(clickable ? { boxShadow: "0 0 0 2px rgba(16,185,129,.25)" } : {}),
+        ...(editMode ? { boxShadow: "0 0 0 2px rgba(16,185,129,.25)" } : {}),
       }}
     >
       <span style={{ background: "#0f1424", color: "#fff", padding: "0 6px", display: "inline-flex", alignItems: "center", letterSpacing: ".05em", fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 11, lineHeight: 1 }}>
@@ -47,23 +51,29 @@ export default function EdsTierBadge({ tiers = {}, size = 24, onPick }) {
       {EDS_LIST.map((eds) => {
         const tier = tiers[eds.key] ?? null;
         const info = tier ? `${eds.label} : rang ${tier}` : `${eds.label} : non classé`;
-        if (clickable) {
+        if (editMode && may(eds.key)) {
           return (
             <button
               key={eds.key}
               type="button"
               onClick={(e) => onPick(eds.key, e)}
-              title={`Mode admin — ${info} (cliquez pour modifier)`}
+              title={`Mode édition — ${info} (cliquez pour modifier)`}
               aria-label={`Modifier le rang ${eds.label} (actuellement ${tier || "non classé"})`}
-              style={segStyle(tier)}
+              style={segStyle(tier, true)}
             >
               <span style={{ fontSize: 8.5, fontWeight: 600, opacity: 0.75 }}>{eds.letter}</span>
               {tier || "–"}
             </button>
           );
         }
+        // Lecture seule. En mode edition (compte EDS restreint), le segment
+        // est attenue et l'infobulle dit pourquoi il n'est pas cliquable.
         return (
-          <span key={eds.key} title={info} style={segStyle(tier)}>
+          <span
+            key={eds.key}
+            title={editMode ? `${info} — lecture seule pour ce compte` : info}
+            style={{ ...segStyle(tier, false), ...(editMode ? { opacity: 0.45 } : {}) }}
+          >
             <span style={{ fontSize: 8.5, fontWeight: 600, opacity: 0.75 }}>{eds.letter}</span>
             {tier || "–"}
           </span>
@@ -74,10 +84,14 @@ export default function EdsTierBadge({ tiers = {}, size = 24, onPick }) {
 }
 
 // Pastille du classement Methodo : [MÉTHODO | lettre], meme style que le badge
-// EDS (segment sombre + segment colore par le tier). En mode admin (onPick
-// fourni), le segment devient un bouton qui ouvre le menu de classement.
-export function MethodoBadge({ tier, size = 24, onPick }) {
-  const clickable = typeof onPick === "function";
+// EDS (segment sombre + segment colore par le tier). En mode edition (onPick
+// fourni), le segment devient un bouton qui ouvre le menu de classement —
+// sauf si canEdit est faux (compte EDS : Methodo reste reserve a l'admin) :
+// lecture seule, attenue, infobulle explicite. Confort d'affichage, la
+// vraie barriere reste le trigger cote base.
+export function MethodoBadge({ tier, size = 24, onPick, canEdit = true }) {
+  const editMode = typeof onPick === "function";
+  const clickable = editMode && canEdit;
   const info = tier ? `Classement Méthodo : rang ${tier}` : "Classement Méthodo : non classé";
 
   const seg = {
@@ -117,14 +131,17 @@ export function MethodoBadge({ tier, size = 24, onPick }) {
         <button
           type="button"
           onClick={(e) => onPick("methodo", e)}
-          title={`Mode admin — ${info} (cliquez pour modifier)`}
+          title={`Mode édition — ${info} (cliquez pour modifier)`}
           aria-label={`Modifier le rang Méthodo (actuellement ${tier || "non classé"})`}
           style={seg}
         >
           {tier || "–"}
         </button>
       ) : (
-        <span title={info} style={seg}>
+        <span
+          title={editMode ? `${info} — lecture seule pour ce compte` : info}
+          style={{ ...seg, ...(editMode ? { opacity: 0.45 } : {}) }}
+        >
           {tier || "–"}
         </span>
       )}

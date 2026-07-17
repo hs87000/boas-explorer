@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import useSession, { isAdminSession } from "../../hooks/useSession";
 import useHashRoute from "../../hooks/useHashRoute";
+import useEditorRole from "../../hooks/useEditorRole";
 import LoginForm from "./LoginForm";
 import TierEditor from "./TierEditor";
 import AuditLog from "./AuditLog";
@@ -46,11 +47,17 @@ export default function AdminPage() {
   const session = useSession();
   const hash = useHashRoute();
   const tab = hash.startsWith("#/admin/historique") ? "historique" : "classements";
+
   // Tout visiteur a desormais une session (anonyme, pour voter) : il ne
   // faut PAS montrer l'editeur a une session anonyme, seulement a une
   // vraie connexion email/mot de passe.
   const admin = isAdminSession(session);
   const [signingOut, setSigningOut] = useState(false);
+
+  // Role d'edition (admin complet ou compte EDS limite a sa colonne),
+  // determine cote base au chargement de la session — hook partage avec
+  // le site public (App), voir hooks/useEditorRole.js.
+  const role = useEditorRole(session);
 
   const signOut = async () => {
     if (signingOut) return;
@@ -106,10 +113,16 @@ export default function AdminPage() {
             Vérification de la session…
           </div>
         ) : admin ? (
-          <>
-            <AdminTabs active={tab} />
-            {tab === "historique" ? <AuditLog /> : <TierEditor />}
-          </>
+          role === undefined ? (
+            <div style={{ textAlign: "center", padding: "80px 20px", color: "#667085", fontFamily: "'JetBrains Mono', monospace", fontSize: 14 }}>
+              Vérification des droits…
+            </div>
+          ) : (
+            <>
+              <AdminTabs active={tab} />
+              {tab === "historique" ? <AuditLog /> : <TierEditor role={role} />}
+            </>
+          )
         ) : (
           <LoginForm />
         )}

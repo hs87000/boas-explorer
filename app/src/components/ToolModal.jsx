@@ -6,7 +6,11 @@ import TierPicker from "./TierPicker";
 
 const filled = (v) => v != null && String(v).trim() !== "";
 
-export default function ToolModal({ tool, onClose, vote, onVote, admin = false, onPickTier }) {
+// admin : mode edition actif (session reelle, role charge). canEditTier :
+// droit par colonne (compte EDS limite a la sienne, admin partout) — meme
+// regle que l'editeur admin. Confort d'AFFICHAGE uniquement : la vraie
+// barriere reste le trigger cote base.
+export default function ToolModal({ tool, onClose, vote, onVote, admin = false, canEditTier, onPickTier }) {
   const mainFields = [
     { k: "Objectif", v: tool.summary },
     { k: "Données de fonctionnement", v: tool.dataDescription },
@@ -85,18 +89,28 @@ export default function ToolModal({ tool, onClose, vote, onVote, admin = false, 
         <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
           {RANKINGS.map((eds) => {
             const tier = tool[eds.field] ?? null;
+            const editable = admin && (canEditTier ? canEditTier(eds.key) : true);
+            // Mode edition mais colonne hors droits (compte EDS d'une autre
+            // ville) : affichage lecture seule avec mention explicite.
+            const lockedForAccount = admin && !editable;
             return (
               <div key={eds.key} style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px 12px" }}>
                 <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, textTransform: "uppercase", letterSpacing: ".06em", color: "#98a2b3", minWidth: 130 }}>
                   Rang · {eds.label}
                 </span>
-                {admin ? (
+                {editable ? (
                   <TierPicker currentTier={tier} onPick={(t) => onPickTier(tool.id, eds.key, t)} />
                 ) : (
                   <>
-                    <span style={{ ...rankBubbleStyle(tier, 26), cursor: "default" }}>{tier || "–"}</span>
+                    <span
+                      title={lockedForAccount ? `${eds.label} : lecture seule pour ce compte` : undefined}
+                      style={{ ...rankBubbleStyle(tier, 26), cursor: "default", ...(lockedForAccount ? { opacity: 0.45 } : {}) }}
+                    >
+                      {tier || "–"}
+                    </span>
                     <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#b0b7c2" }}>
                       {tier ? `Classé ${tier}` : "Non classé"}
+                      {lockedForAccount ? " · lecture seule pour ce compte" : ""}
                     </span>
                   </>
                 )}
